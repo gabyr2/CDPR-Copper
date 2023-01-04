@@ -43,7 +43,8 @@ You will be graded by the quality of your visualizations and storytelling; **mak
 
 Following is to show how to save a plot to a file: 
 
-```{r}
+
+```r
 # this is how you save a plot to a file
 library(ggplot2)
 library(scales)
@@ -64,7 +65,8 @@ https://stat.ethz.ch/R-manual/R-devel/library/grDevices/html/png.html
 
 **Activity:**
 
-```{r}
+
+```r
 # Read your data here; 
 
 # Clean it up, reformat it, filter it, sort it, group it, etc.
@@ -86,19 +88,39 @@ My graduate research project is looking at the potential effects of copper-based
 
 ## Step 1: Read in data, do some general clean-up and reformatting
 
-```{r}
+
+```r
 # Load tidyverse
 library(tidyverse)
 ```
 
-```{r}
+```
+## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+## ✔ tibble  3.1.8      ✔ dplyr   1.0.10
+## ✔ tidyr   1.2.1      ✔ stringr 1.5.0 
+## ✔ readr   2.1.3      ✔ forcats 0.5.2 
+## ✔ purrr   0.3.5      
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ readr::col_factor() masks scales::col_factor()
+## ✖ purrr::discard()    masks scales::discard()
+## ✖ dplyr::filter()     masks stats::filter()
+## ✖ dplyr::lag()        masks stats::lag()
+```
+
+
+```r
 # Read in data.  Note this is a very large dataset (108MB), over 750,000 rows in csv.
 setwd("C:/Users/gidge/OneDrive - University of Missouri/PhD Thesis Files/Data/CDPR Copper")
 copper <- read.csv("CalPIP_Cu_2008-2018.csv")
 dim(copper)
 ```
 
-```{r}
+```
+## [1] 759363     17
+```
+
+
+```r
 # This code chunk is here as a check on the filtering of SITE_NAME.  Here I'm just calculating how many rows should remain
 # in the dataframe after I remove the site names that I do not want to include.
 # First, I create a new dataframe called 'sites' that includes the counts of all the different site names.  This helped me
@@ -143,16 +165,63 @@ sites %>% filter(SITE_NAME != "" &
                    SITE_NAME != "VERTEBRATE PEST CONTROL" & 
                    SITE_NAME != "WOOD PROTECTION TREATMENTS (ALL OR UNSPECIFIED)") %>%
 summarize(n = sum(n))
+```
 
+```
+##        n
+## 1 691173
+```
+
+```r
 # after filtering the sites, there are 691173 rows.
 ```
 
-```{r}
+
+```r
 # clean up, reformat, filter, sort, group, etc.
 head(copper)
 ```
 
-```{r}
+```
+##   ADJUVANT YEAR     DATE COUNTY_NAME      COMTRS             SITE_NAME
+## 1       NO 2018 01-06-18   CALAVERAS          05 LANDSCAPE MAINTENANCE
+## 2       NO 2018 14-04-18        NAPA 28M09N06W32          GRAPES, WINE
+## 3       NO 2018 14-04-18        NAPA 28M09N06W32          GRAPES, WINE
+## 4       NO 2018 27-04-18        NAPA 28M08N05W05          GRAPES, WINE
+## 5       NO 2018 01-06-18       MARIN          21 LANDSCAPE MAINTENANCE
+## 6       NO 2018 01-06-18       MARIN          21 LANDSCAPE MAINTENANCE
+##    PRODUCT_NAME POUNDS_PRODUCT_APPLIED      CHEMICAL_NAME
+## 1 49'ER BONANZA                  1e-04      COPPER OLEATE
+## 2      BADGE X2                  1e-02   COPPER HYDROXIDE
+## 3      BADGE X2                  1e-02 COPPER OXYCHLORIDE
+## 4  NORDOX 75 WG                  1e-02 COPPER OXIDE (OUS)
+## 5      BADGE X2                  1e-02   COPPER HYDROXIDE
+## 6      BADGE X2                  1e-02 COPPER OXYCHLORIDE
+##   POUNDS_CHEMICAL_APPLIED AMOUNT_TREATED UNIT_TREATED AERIAL_GROUND_INDICATOR
+## 1               1.525e-05             NA                                     
+## 2               2.149e-03           0.02            A                       G
+## 3               2.382e-03           0.02            A                       G
+## 4               8.390e-03           0.01            A                       G
+## 5               2.149e-03             NA                                     
+## 6               2.382e-03             NA                                     
+##   AERIAL_GROUND_DESCRIPTION AMOUNT_PRODUCT_APPLIED APPLICATION_MONTH
+## 1                   UNKNOWN                  0.001              JUNE
+## 2                    GROUND                  0.010             APRIL
+## 3                    GROUND                  0.010             APRIL
+## 4                    GROUND                  0.010             APRIL
+## 5                   UNKNOWN                  0.010              JUNE
+## 6                   UNKNOWN                  0.010              JUNE
+##   CHEMICAL_CODE
+## 1           154
+## 2           151
+## 3           156
+## 4           175
+## 5           151
+## 6           156
+```
+
+
+```r
 # remove unnecessary columns
 copper <- copper[ ,-c(1, 3, 5, 13, 14, 17)]
 
@@ -195,13 +264,38 @@ copper <- copper %>%
                    SITE_NAME != "WOOD PROTECTION TREATMENTS (ALL OR UNSPECIFIED)")
 
 dim(copper)
-
 ```
 
-```{r}
+```
+## [1] 691173     11
+```
+
+
+```r
 sum(is.na(copper$POUNDS_CHEMICAL_APPLIED))
+```
+
+```
+## [1] 54
+```
+
+```r
 sum(is.na(copper$APPLICATION_MONTH))
+```
+
+```
+## [1] 0
+```
+
+```r
 sum(copper$APPLICATION_MONTH == "")
+```
+
+```
+## [1] 18
+```
+
+```r
 # sum(copper$POUNDS_CHEMICAL_APPLIED == "")
 
 # There are some NA or blank values in these columns, so, I'm going to remove these:
@@ -215,12 +309,35 @@ copper <- copper %>%
 dim(copper) # This is a check for myself
 ```
 
-```{r}
+```
+## [1] 691101     11
+```
+
+
+```r
 # Ensuring that there is data for every county so that I can actually create a choropleth
 
 copper$COUNTY_NAME <- factor(copper$COUNTY_NAME)
 levels(copper$COUNTY_NAME)
+```
 
+```
+##  [1] "ALAMEDA"         "AMADOR"          "BUTTE"           "CALAVERAS"      
+##  [5] "COLUSA"          "CONTRA COSTA"    "DEL NORTE"       "EL DORADO"      
+##  [9] "FRESNO"          "GLENN"           "HUMBOLDT"        "IMPERIAL"       
+## [13] "KERN"            "KINGS"           "LAKE"            "LASSEN"         
+## [17] "LOS ANGELES"     "MADERA"          "MARIN"           "MARIPOSA"       
+## [21] "MENDOCINO"       "MERCED"          "MODOC"           "MONTEREY"       
+## [25] "NAPA"            "NEVADA"          "ORANGE"          "PLACER"         
+## [29] "RIVERSIDE"       "SACRAMENTO"      "SAN BENITO"      "SAN BERNARDINO" 
+## [33] "SAN DIEGO"       "SAN JOAQUIN"     "SAN LUIS OBISPO" "SAN MATEO"      
+## [37] "SANTA BARBARA"   "SANTA CLARA"     "SANTA CRUZ"      "SHASTA"         
+## [41] "SISKIYOU"        "SOLANO"          "SONOMA"          "STANISLAUS"     
+## [45] "SUTTER"          "TEHAMA"          "TRINITY"         "TULARE"         
+## [49] "TUOLUMNE"        "VENTURA"         "YOLO"            "YUBA"
+```
+
+```r
 # After removing the SITE_NAME examples that I don't want to include in this dataset, some of the Counties are also gone.
 # Alpine: had no copper-pesticide applications recorded 2008-2018
 # Inyo: only had Rights of Way, Landscape Maintenance, Structural Pest Control
@@ -240,8 +357,27 @@ CountyNAs <- expand.grid(c(2008:2018),
 # names(copper)
 CountyNAs <- CountyNAs %>% rename(YEAR = Var1, COUNTY_NAME = Var2, POUNDS_CHEMICAL_APPLIED = Var3)
 head(CountyNAs)
-dim(CountyNAs)
+```
 
+```
+##   YEAR COUNTY_NAME POUNDS_CHEMICAL_APPLIED
+## 1 2008      ALPINE                       0
+## 2 2009      ALPINE                       0
+## 3 2010      ALPINE                       0
+## 4 2011      ALPINE                       0
+## 5 2012      ALPINE                       0
+## 6 2013      ALPINE                       0
+```
+
+```r
+dim(CountyNAs)
+```
+
+```
+## [1] 66  3
+```
+
+```r
 # Now add these NA values to the copper dataframe
 # because binding 
 copper <- copper %>% 
@@ -250,7 +386,12 @@ copper <- copper %>%
 dim(copper) # should be, and is, 691167 rows.
 ```
 
-```{r}
+```
+## [1] 691167     11
+```
+
+
+```r
 # Clean up the uppercases stuff everywhere (in the row values, not the columns) to Title Case
 # Keep everything as factor variables
 # For month, establish order of the months
@@ -265,19 +406,90 @@ copper$PRODUCT_NAME <- factor(str_to_title(copper$PRODUCT_NAME))
 head(copper)
 ```
 
+```
+##   YEAR COUNTY_NAME    SITE_NAME PRODUCT_NAME POUNDS_PRODUCT_APPLIED
+## 1 2018        Napa Grapes, Wine     Badge X2                 0.0100
+## 2 2018        Napa Grapes, Wine     Badge X2                 0.0100
+## 3 2018        Napa Grapes, Wine Nordox 75 Wg                 0.0100
+## 4 2018        Napa Grapes, Wine Nordox 75 Wg                 0.0100
+## 5 2018      Merced       Tomato   Nu-Cop Xlr                 0.0983
+## 6 2018      Merced       Tomato   Nu-Cop Xlr                 0.0983
+##        CHEMICAL_NAME POUNDS_CHEMICAL_APPLIED AMOUNT_TREATED UNIT_TREATED
+## 1   Copper Hydroxide              0.00214900           0.02            A
+## 2 Copper Oxychloride              0.00238200           0.02            A
+## 3 Copper Oxide (Ous)              0.00839000           0.01            A
+## 4 Copper Oxide (Ous)              0.00839000           0.01            A
+## 5   Copper Hydroxide              0.01676998           0.03            A
+## 6   Copper Hydroxide              0.01676998           0.03            A
+##   AMOUNT_PRODUCT_APPLIED APPLICATION_MONTH
+## 1                   0.01             April
+## 2                   0.01             April
+## 3                   0.01             April
+## 4                   0.01               May
+## 5                   0.01         September
+## 6                   0.01         September
+```
+
 ## Step 2: Explore the data, create preliminary figures to understand different ways to look at the dataset, and help decide which trends will be best to tell the data's story
 
-```{r}
+
+```r
 # General Exploration of the Dataframe
 summary(copper)
+```
 
+```
+##       YEAR           COUNTY_NAME    
+##  Min.   :2008   Tulare     :113283  
+##  1st Qu.:2011   Fresno     : 87555  
+##  Median :2014   Kern       : 52689  
+##  Mean   :2013   Monterey   : 40964  
+##  3rd Qu.:2016   Stanislaus : 38228  
+##  Max.   :2018   San Joaquin: 29906  
+##                 (Other)    :328542  
+##                                    SITE_NAME     
+##  Grapes, Wine                           :114425  
+##  Walnut (English Walnut, Persian Walnut):100229  
+##  Grapes                                 : 87718  
+##  Orange (All Or Unspec)                 : 80982  
+##  Almond                                 : 37880  
+##  (Other)                                :269867  
+##  NA's                                   :    66  
+##                                    PRODUCT_NAME    POUNDS_PRODUCT_APPLIED
+##  Dupont Kocide 3000 Fungicide/Bactericide: 95841   Min.   :    0.0       
+##  Badge X2                                : 83436   1st Qu.:   15.0       
+##  Nordox 75 Wg                            : 55538   Median :   52.0       
+##  Basic Copper 53                         : 46842   Mean   :  156.8       
+##  Nu-Cop 50df                             : 43938   3rd Qu.:  150.0       
+##  (Other)                                 :365506   Max.   :32603.0       
+##  NA's                                    :    66   NA's   :66            
+##                 CHEMICAL_NAME    POUNDS_CHEMICAL_APPLIED AMOUNT_TREATED    
+##  Copper Hydroxide      :367773   Min.   :    0.000       Min.   :     0.0  
+##  Copper Sulfate (Basic):122061   1st Qu.:    5.456       1st Qu.:     6.9  
+##  Copper Oxychloride    : 69986   Median :   24.640       Median :    18.0  
+##  Copper Oxide (Ous)    : 66797   Mean   :   84.152       Mean   :   570.4  
+##  Copper Octanoate      : 28496   3rd Qu.:   75.547       3rd Qu.:    40.0  
+##  (Other)               : 35988   Max.   :22639.200       Max.   :379390.0  
+##  NA's                  :    66                           NA's   :71        
+##  UNIT_TREATED       AMOUNT_PRODUCT_APPLIED APPLICATION_MONTH
+##  Length:691167      Min.   :     0.0       April   :186113  
+##  Class :character   1st Qu.:    13.5       March   : 86209  
+##  Mode  :character   Median :    50.0       May     : 74976  
+##                     Mean   :   163.6       January : 74595  
+##                     3rd Qu.:   150.0       November: 67921  
+##                     Max.   :362496.0       (Other) :201287  
+##                     NA's   :66             NA's    :    66
+```
+
+```r
 # Most number of applications made in Tulare county.
 # Most number of applications made on wine grapes (114425) and then walnuts (100229).
 # Most common chemicals applied are copper hydroxide (367773), then copper sulfate (basic) (122061).
 # Most common months of application are April (186113 applications), then March (86209).
 ```
 
-```{r}
+
+```r
 # Now I can create summarizing dataframes that reformat and group the data in a way that I can use more readily
 # for different visualizations.  Using these kinds of summarized dataframes will help with processing speeds too.
 
@@ -285,16 +497,82 @@ summary(copper)
 yrMonCounty <- copper %>%
                 group_by(YEAR, APPLICATION_MONTH, COUNTY_NAME) %>%
                 summarize(TotalPoundsChemAppl = sum(POUNDS_CHEMICAL_APPLIED))
-head(yrMonCounty)
+```
 
+```
+## `summarise()` has grouped output by 'YEAR', 'APPLICATION_MONTH'. You can
+## override using the `.groups` argument.
+```
+
+```r
+head(yrMonCounty)
+```
+
+```
+## # A tibble: 6 × 4
+## # Groups:   YEAR, APPLICATION_MONTH [1]
+##    YEAR APPLICATION_MONTH COUNTY_NAME  TotalPoundsChemAppl
+##   <int> <fct>             <fct>                      <dbl>
+## 1  2008 January           Butte                 10791.    
+## 2  2008 January           Colusa                  374.    
+## 3  2008 January           Contra Costa           1248.    
+## 4  2008 January           Fresno               166257.    
+## 5  2008 January           Glenn                  3023.    
+## 6  2008 January           Humboldt                  0.0505
+```
+
+```r
 # A dataframe that summarizes by year, month, county, chemical name, and crop
 
 yrMonCountyChemCrop <- copper %>%
                         group_by(YEAR, APPLICATION_MONTH, COUNTY_NAME, CHEMICAL_NAME, SITE_NAME) %>%
                         summarize(TotalPoundsChemAppl = sum(POUNDS_CHEMICAL_APPLIED))
+```
 
+```
+## `summarise()` has grouped output by 'YEAR', 'APPLICATION_MONTH', 'COUNTY_NAME',
+## 'CHEMICAL_NAME'. You can override using the `.groups` argument.
+```
+
+```r
 head(yrMonCountyChemCrop)
+```
+
+```
+## # A tibble: 6 × 6
+## # Groups:   YEAR, APPLICATION_MONTH, COUNTY_NAME, CHEMICAL_NAME [3]
+##    YEAR APPLICATION_MONTH COUNTY_NAME CHEMICAL_NAME          SITE_NAME   Total…¹
+##   <int> <fct>             <fct>       <fct>                  <fct>         <dbl>
+## 1  2008 January           Butte       Copper Hydroxide       Almond       211.  
+## 2  2008 January           Butte       Copper Hydroxide       Peach         32.7 
+## 3  2008 January           Butte       Copper Hydroxide       Prune       2009.  
+## 4  2008 January           Butte       Copper Sulfate (Basic) Peach       8538.  
+## 5  2008 January           Colusa      Copper Hydroxide       Cabbage        5.19
+## 6  2008 January           Colusa      Copper Hydroxide       Onion (Dry…  369.  
+## # … with abbreviated variable name ¹​TotalPoundsChemAppl
+```
+
+```r
 yrMonCountyChemCrop[yrMonCountyChemCrop$COUNTY_NAME == "Alpine",]
+```
+
+```
+## # A tibble: 11 × 6
+## # Groups:   YEAR, APPLICATION_MONTH, COUNTY_NAME, CHEMICAL_NAME [11]
+##     YEAR APPLICATION_MONTH COUNTY_NAME CHEMICAL_NAME SITE_NAME TotalPoundsChem…¹
+##    <int> <fct>             <fct>       <fct>         <fct>                 <dbl>
+##  1  2008 <NA>              Alpine      <NA>          <NA>                      0
+##  2  2009 <NA>              Alpine      <NA>          <NA>                      0
+##  3  2010 <NA>              Alpine      <NA>          <NA>                      0
+##  4  2011 <NA>              Alpine      <NA>          <NA>                      0
+##  5  2012 <NA>              Alpine      <NA>          <NA>                      0
+##  6  2013 <NA>              Alpine      <NA>          <NA>                      0
+##  7  2014 <NA>              Alpine      <NA>          <NA>                      0
+##  8  2015 <NA>              Alpine      <NA>          <NA>                      0
+##  9  2016 <NA>              Alpine      <NA>          <NA>                      0
+## 10  2017 <NA>              Alpine      <NA>          <NA>                      0
+## 11  2018 <NA>              Alpine      <NA>          <NA>                      0
+## # … with abbreviated variable name ¹​TotalPoundsChemAppl
 ```
 
 TO-DO LIST:
@@ -318,7 +596,8 @@ Plots to Consider:
     - could result in a choropleth that shows what percent of each county's total chemical applied is applied on grapes
     - also think of this for the counties of interest - what crop are chemicals MOST used on in these counties specifically?
 
-```{r EDA-1}
+
+```r
 # Overview histograms to explore the data a little bit
 # This will help me narrow in on what story I want to tell with this dataset
 
@@ -332,7 +611,11 @@ yrMonCountyChemCrop %>%
         geom_bar(stat = "identity") +
         coord_flip() +
         theme_minimal()
+```
 
+![](CDPR-Copper_files/figure-html/EDA-1-1.png)<!-- -->
+
+```r
 # Some of these values are so small that they're not visible: log axis helps display them
 yrMonCountyChemCrop %>% 
     drop_na(CHEMICAL_NAME) %>%
@@ -346,7 +629,10 @@ yrMonCountyChemCrop %>%
         scale_y_log10()
 ```
 
-```{r EDA-2}
+![](CDPR-Copper_files/figure-html/EDA-1-2.png)<!-- -->
+
+
+```r
 # Overview histograms to explore the data a little bit
 # This will help me narrow in on what story I want to tell with this dataset
 
@@ -358,7 +644,16 @@ yrMonCounty %>%
     geom_bar(stat = "identity") +
     coord_flip() +
     theme_minimal()
+```
 
+```
+## `summarise()` has grouped output by 'COUNTY_NAME'. You can override using the
+## `.groups` argument.
+```
+
+![](CDPR-Copper_files/figure-html/EDA-2-1.png)<!-- -->
+
+```r
 # Histogram of total chem applied by county, faceted by year
 # yrMonCounty %>%
 #     group_by(COUNTY_NAME, YEAR) %>%
@@ -383,7 +678,15 @@ yrMonCounty %>%
     theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r EDA-3}
+```
+## `summarise()` has grouped output by 'COUNTY_NAME'. You can override using the
+## `.groups` argument.
+```
+
+![](CDPR-Copper_files/figure-html/EDA-2-2.png)<!-- -->
+
+
+```r
 # Overview histograms to explore the data a little bit
 # This will help me narrow in on what story I want to tell with this dataset
 
@@ -398,8 +701,16 @@ yrMonCountyChemCrop %>%
     geom_bar(stat = "identity") +
     coord_flip() +
     theme_minimal()
+```
 
+```
+## `summarise()` has grouped output by 'SITE_NAME'. You can override using the
+## `.groups` argument.
+```
 
+![](CDPR-Copper_files/figure-html/EDA-3-1.png)<!-- -->
+
+```r
 # Histogram of total chem applied by crop, hard to see all of them in one graph, so I did top 15
 yrMonCountyChemCrop %>%
     drop_na(SITE_NAME) %>%
@@ -414,8 +725,16 @@ yrMonCountyChemCrop %>%
 #     geom_bar(stat = "identity") +
     coord_flip() +
     theme_minimal()
+```
 
+```
+## `summarise()` has grouped output by 'SITE_NAME'. You can override using the
+## `.groups` argument.
+```
 
+![](CDPR-Copper_files/figure-html/EDA-3-2.png)<!-- -->
+
+```r
 # Dataframe of total chem applied by crop, faceted by year.  Top ten crops per year only.
 yrMonCountyChemCrop[yrMonCountyChemCrop$COUNTY_NAME == "Fresno" & yrMonCountyChemCrop$YEAR == 2018,] %>%
     group_by(SITE_NAME, YEAR) %>%
@@ -423,8 +742,31 @@ yrMonCountyChemCrop[yrMonCountyChemCrop$COUNTY_NAME == "Fresno" & yrMonCountyChe
     group_by(YEAR) %>%
     top_n(TotalPounds, n = 10) %>%
     arrange(TotalPounds)
+```
 
+```
+## `summarise()` has grouped output by 'SITE_NAME'. You can override using the
+## `.groups` argument.
+```
 
+```
+## # A tibble: 10 × 3
+## # Groups:   YEAR [1]
+##    SITE_NAME                                         YEAR TotalPounds
+##    <fct>                                            <int>       <dbl>
+##  1 Lemon                                             2018       8842.
+##  2 Plum (Includes Wild Plums For Human Consumption)  2018      11202.
+##  3 Olive (All Or Unspec)                             2018      11238.
+##  4 Peach                                             2018      13686.
+##  5 Onion (Dry, Spanish, White, Yellow, Red, Etc.)    2018      18093.
+##  6 Tangerine (Mandarin, Satsuma, Murcott, Etc.)      2018      47662.
+##  7 Grapes, Wine                                      2018      50145.
+##  8 Grapes                                            2018      96685.
+##  9 Orange (All Or Unspec)                            2018     108314.
+## 10 Almond                                            2018     234342.
+```
+
+```r
 # This shows the top 5 crops with greatest TotalPoundsChemAppl each year
 # Note that all crops are kept in every facet.  This is because not all years have the same top 5 crops.  If I 
 # removed the crops not in the top 5 for each individual year, then each facet would need the y-axis labeled every time.
@@ -444,7 +786,15 @@ yrMonCountyChemCrop %>%
     theme(axis.text.x = element_text(angle = 90))
 ```
 
-```{r EDA-4}
+```
+## `summarise()` has grouped output by 'SITE_NAME'. You can override using the
+## `.groups` argument.
+```
+
+![](CDPR-Copper_files/figure-html/EDA-3-3.png)<!-- -->
+
+
+```r
 # Overview histograms to explore the data a little bit
 # This will help me narrow in on what story I want to tell with this dataset
 
@@ -455,7 +805,10 @@ ggplot(data = drop_na(yrMonCounty, APPLICATION_MONTH), aes(x = fct_rev(APPLICATI
     theme_minimal()
 ```
 
-```{r EDA-5}
+![](CDPR-Copper_files/figure-html/EDA-4-1.png)<!-- -->
+
+
+```r
 # Overview histograms to explore the data a little bit
 # This will help me narrow in on what story I want to tell with this dataset
 
@@ -475,7 +828,26 @@ yrMonCounty %>%
     stat_summary(aes(group = 1), fun.y = "mean", color = "red", size = 1, geom = "line") +
 #     geom_boxplot(fill = NA) +
     theme_minimal()
+```
 
+```
+## `summarise()` has grouped output by 'COUNTY_NAME'. You can override using the
+## `.groups` argument.
+```
+
+```
+## Warning: The `fun.y` argument of `stat_summary()` is deprecated as of ggplot2 3.3.0.
+## ℹ Please use the `fun` argument instead.
+```
+
+```
+## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+## ℹ Please use `linewidth` instead.
+```
+
+![](CDPR-Copper_files/figure-html/EDA-5-1.png)<!-- -->
+
+```r
 # Using only the top 10 counties shows a bit more variation over time, but not much
 
 yrMonCounty %>%
@@ -491,16 +863,33 @@ yrMonCounty %>%
     theme_minimal()
 ```
 
+```
+## `summarise()` has grouped output by 'COUNTY_NAME'. You can override using the
+## `.groups` argument.
+```
+
+![](CDPR-Copper_files/figure-html/EDA-5-2.png)<!-- -->
+
 ## Step 3: Create figures to use in the 'one-pager':
 ### - Choropleth, with shapefile outline of the San Joaquin Valley Air Basin
 
-```{r Choropleth Preparation}
+
+```r
 # Choropleth Mapping: Data Preparation
 
 # First, need to get CA county map data
 CA <- map_data('county', 'california')
 head(CA, 3)
+```
 
+```
+##        long     lat group order     region subregion
+## 1 -121.4785 37.4829     1     1 california   alameda
+## 2 -121.5129 37.4829     1     2 california   alameda
+## 3 -121.8853 37.4829     1     3 california   alameda
+```
+
+```r
 # This is the dataframe that will be linked to the map data in order to plot it
 # Yearly sums of pounds of copper-based chemical applied in each county
 # head(yrMonCounty)
@@ -508,17 +897,51 @@ head(CA, 3)
 yrCounty <- yrMonCounty %>%
                 group_by(COUNTY_NAME, YEAR) %>%
                 summarize(TotalPounds = sum(TotalPoundsChemAppl))
+```
 
+```
+## `summarise()` has grouped output by 'COUNTY_NAME'. You can override using the
+## `.groups` argument.
+```
+
+```r
 # Need to convert COUNTY_NAME from title case to lower case to match the map data
 yrCounty$COUNTY_NAME <- str_to_lower(yrCounty$COUNTY_NAME)
 
 head(yrCounty)
+```
 
+```
+## # A tibble: 6 × 3
+## # Groups:   COUNTY_NAME [1]
+##   COUNTY_NAME  YEAR TotalPounds
+##   <chr>       <int>       <dbl>
+## 1 alameda      2008        47.3
+## 2 alameda      2009        28.8
+## 3 alameda      2010       221. 
+## 4 alameda      2011      1059. 
+## 5 alameda      2012      1326. 
+## 6 alameda      2013      3867.
+```
+
+```r
 # Trick: need to convert CA$region to equal CA$subregion so that ggplot will know that we want to plot based on counties, 
 # otherwise, the 'region' section will be all 'california'
 CA$region <- CA$subregion
 head(CA)
+```
 
+```
+##        long      lat group order  region subregion
+## 1 -121.4785 37.48290     1     1 alameda   alameda
+## 2 -121.5129 37.48290     1     2 alameda   alameda
+## 3 -121.8853 37.48290     1     3 alameda   alameda
+## 4 -121.8968 37.46571     1     4 alameda   alameda
+## 5 -121.9254 37.45998     1     5 alameda   alameda
+## 6 -121.9483 37.47717     1     6 alameda   alameda
+```
+
+```r
 # Create a column for proportional amount of pounds applied
 # This calculates what percent of the total pounds applied to a single county is of the total pounds applied to the 
 # whole state.
@@ -534,14 +957,55 @@ yrCounty <- yrCounty %>%
 SEKI <- data.frame(long = -118.667387, lat = 36.601038, name = "Sequoia National Park")
 ```
 
-```{r}
+
+```r
 # Creating dataframe for San Joaquin Air Basin from shapefile
 library(rgdal)
+```
+
+```
+## Loading required package: sp
+```
+
+```
+## Please note that rgdal will be retired during 2023,
+## plan transition to sf/stars/terra functions using GDAL and PROJ
+## at your earliest convenience.
+## See https://r-spatial.org/r/2022/04/12/evolution.html and https://github.com/r-spatial/evolution
+## rgdal: version: 1.6-2, (SVN revision 1183)
+## Geospatial Data Abstraction Library extensions to R successfully loaded
+## Loaded GDAL runtime: GDAL 3.5.2, released 2022/09/02
+## Path to GDAL shared files: C:/Users/gidge/AppData/Local/R/win-library/4.2/rgdal/gdal
+## GDAL binary built with GEOS: TRUE 
+## Loaded PROJ runtime: Rel. 8.2.1, January 1st, 2022, [PJ_VERSION: 821]
+## Path to PROJ shared files: C:/Users/gidge/AppData/Local/R/win-library/4.2/rgdal/proj
+## PROJ CDN enabled: FALSE
+## Linking to sp version:1.5-1
+## To mute warnings of possible GDAL/OSR exportToProj4() degradation,
+## use options("rgdal_show_exportToProj4_warnings"="none") before loading sp or rgdal.
+```
+
+```r
 library(maptools)
+```
+
+```
+## Checking rgeos availability: TRUE
+## Please note that 'maptools' will be retired during 2023,
+## plan transition at your earliest convenience;
+## some functionality will be moved to 'sp'.
+```
+
+```r
 library(sf)
 ```
 
-```{r OUTDATED Spatial Code, eval=FALSE}
+```
+## Linking to GEOS 3.9.3, GDAL 3.5.2, PROJ 8.2.1; sf_use_s2() is TRUE
+```
+
+
+```r
 # Creating dataframe for San Joaquin Air Basin from shapefile
 
 # Read in the shapefile data (multiple files)
@@ -571,55 +1035,155 @@ head(sjab_df)
 # help(spTransform)
 ```
 
-```{r UPDATED Spatial Code}
+
+```r
 # New code bc above package is retiring
 # st_read reads in the shapefile data 
 setwd("C:/Users/gidge/OneDrive - University of Missouri/PhD Thesis Files/Data/CDPR Copper")
 ab <- st_read(dsn="ca_air_basins/", layer="CaAirBasin")
-class(ab)
+```
 
+```
+## Reading layer `CaAirBasin' from data source 
+##   `C:\Users\gidge\OneDrive - University of Missouri\PhD Thesis Files\Data\CDPR Copper\ca_air_basins' 
+##   using driver `ESRI Shapefile'
+## Simple feature collection with 15 features and 5 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -373976.8 ymin: -604526.1 xmax: 540015.4 ymax: 450070.9
+## Projected CRS: TealeAlbersNAD83
+```
+
+```r
+class(ab)
+```
+
+```
+## [1] "sf"         "data.frame"
+```
+
+```r
 # convert from MULTIPOLYGON to POLYGON
 ab2 <- st_cast(ab, "POLYGON")
+```
 
+```
+## Warning in st_cast.sf(ab, "POLYGON"): repeating attributes for all
+## sub-geometries for which they may not be constant
+```
+
+```r
 # Selects only the San Joaquin Valley Air Basin geometries
 sjv <- ab2[ab2$NAME == "San Joaquin Valley",]$geometry
 
 # check class 
 class(sjv)
+```
 
+```
+## [1] "sfc_POLYGON" "sfc"
+```
+
+```r
 # convert to sf and data.frame
 sjv_sf <- st_as_sf(sjv)
 
 # recheck class
 class(sjv_sf)
+```
 
+```
+## [1] "sf"         "data.frame"
+```
+
+```r
 # quick plot
 plot(sjv_sf)
+```
 
+![](CDPR-Copper_files/figure-html/UPDATED Spatial Code-1.png)<!-- -->
+
+```r
 # transform the coordinates from TealeAlbersNAD83 in UTMs to WGS84 in lat, long
 sjv_sf_wgs84 <- st_transform(sjv_sf, crs = st_crs("WGS84"))
 
 plot(sjv_sf_wgs84)
+```
 
+![](CDPR-Copper_files/figure-html/UPDATED Spatial Code-2.png)<!-- -->
+
+```r
 # This is the first level list of the sf data.frame:
 head(sjv_sf_wgs84[[1]]) 
+```
+
+```
+## Geometry set for 1 feature 
+## Geometry type: POLYGON
+## Dimension:     XY
+## Bounding box:  xmin: -121.5846 ymin: 34.81111 xmax: -117.9805 ymax: 38.29992
+## Geodetic CRS:  WGS 84
+```
+
+```
+## POLYGON ((-121.0271 38.2999, -121.0241 38.29248...
+```
+
+```r
 # This is the second list, printed in full.  (Ugly, don't run.)
 # head(sjv_sf_wgs84[[1]][[1]]) 
 
 # This is third level of listing in this object. 
 # [,1] is the column of longitude values.  [,2] is the column of latitude values.
 head(sjv_sf_wgs84[[1]][[1]][[1]]) 
+```
+
+```
+##           [,1]     [,2]
+## [1,] -121.0271 38.29990
+## [2,] -121.0241 38.29248
+## [3,] -121.0236 38.29131
+## [4,] -121.0216 38.28630
+## [5,] -121.0211 38.28508
+## [6,] -121.0200 38.28277
+```
+
+```r
 # So, use these in the ggplot to call out the long and lat.
 head(sjv_sf_wgs84[[1]][[1]][[1]][,1])
-head(sjv_sf_wgs84[[1]][[1]][[1]][,2])
+```
 
+```
+## [1] -121.0271 -121.0241 -121.0236 -121.0216 -121.0211 -121.0200
+```
+
+```r
+head(sjv_sf_wgs84[[1]][[1]][[1]][,2])
+```
+
+```
+## [1] 38.29990 38.29248 38.29131 38.28630 38.28508 38.28277
+```
+
+```r
 # Make a new dataframe of the sjvab long and lat to plot in ggplot
 sjvab_coords <- data.frame(long = sjv_sf_wgs84[[1]][[1]][[1]][,1], lat = sjv_sf_wgs84[[1]][[1]][[1]][,2])
 head(sjvab_coords)
 ```
 
+```
+##        long      lat
+## 1 -121.0271 38.29990
+## 2 -121.0241 38.29248
+## 3 -121.0236 38.29131
+## 4 -121.0216 38.28630
+## 5 -121.0211 38.28508
+## 6 -121.0200 38.28277
+```
 
-```{r Choropleths}
+
+
+```r
 # Choropleth Mapping: Plotting
 # This is for 2018 only
 
@@ -675,8 +1239,11 @@ theme(legend.position = c(1, 0.75),
 
 # set coordinates and theme for display purposes
 coord_map("polyconic")
+```
 
+![](CDPR-Copper_files/figure-html/Choropleths-1.png)<!-- -->
 
+```r
 # Close graphical device
 # dev.off()
 
@@ -733,8 +1300,11 @@ theme(legend.position = c(1, 0.75),
 
 # set coordinates and theme for display purposes
 coord_map("polyconic")
+```
 
+![](CDPR-Copper_files/figure-html/Choropleths-2.png)<!-- -->
 
+```r
 # Close graphical device
 # dev.off()
 
@@ -783,18 +1353,38 @@ labs(title = "Pounds of Copper-Based Pesticides Applied per County, \nRepresente
 # set coordinates and theme for display purposes
 coord_map("polyconic") +
 theme_void()
+```
 
+![](CDPR-Copper_files/figure-html/Choropleths-3.png)<!-- -->
+
+```r
 # Close graphical device
 # dev.off()
 ```
 
 #### Calculation for one of the annotations in the 'one-pager':
 
-```{r}
+
+```r
 # Annotations: 
 # Calculating percent of copper-based pesticides applied in counties within the SJV Air Basin
 head(yrCounty[yrCounty$YEAR == 2018,])
+```
 
+```
+## # A tibble: 6 × 5
+## # Groups:   YEAR [1]
+##   COUNTY_NAME  YEAR TotalPounds StateTotal CountyProp
+##   <chr>       <int>       <dbl>      <dbl>      <dbl>
+## 1 alameda      2018        493.   5517621.    0.00893
+## 2 alpine       2018          0    5517621.    0      
+## 3 amador       2018       1427.   5517621.    0.0259 
+## 4 butte        2018     492363.   5517621.    8.92   
+## 5 calaveras    2018       1740.   5517621.    0.0315 
+## 6 colusa       2018     142546.   5517621.    2.58
+```
+
+```r
 SJVABPounds <- 
 yrCounty[yrCounty$YEAR == 2018 & 
          (yrCounty$COUNTY_NAME == "san joaquin" | 
@@ -810,16 +1400,50 @@ yrCounty[yrCounty$YEAR == 2018 &
 StateTotal2018 <- yrCounty[yrCounty$YEAR == 2018,] %>% summarize(StateTotal = sum(TotalPounds))
 
 SJVABPounds
-StateTotal2018
+```
 
+```
+## # A tibble: 1 × 2
+##    YEAR SJVABPounds
+##   <int>       <dbl>
+## 1  2018    3240712.
+```
+
+```r
+StateTotal2018
+```
+
+```
+## # A tibble: 1 × 2
+##    YEAR StateTotal
+##   <int>      <dbl>
+## 1  2018   5517621.
+```
+
+```r
 # Calculate percent of pesticides applied in SJVAB counties
 (SJVABPounds$SJVABPounds/StateTotal2018$StateTotal)*100
+```
+
+```
+## [1] 58.73385
+```
+
+```r
 3240712/5517621*100
+```
+
+```
+## [1] 58.73386
+```
+
+```r
 # From this, I will add a small annotation that states that the counties that make up the SJV Air Basin account for 59% of
 # the entire state's application of copper-based pesticides in 2018.
 ```
 
-```{r}
+
+```r
 # head(yrMonCounty[yrMonCounty$YEAR == 2018,])
 
 SJVABPounds2 <- 
@@ -841,17 +1465,58 @@ StateTotal2018 <- yrMonCounty[yrMonCounty$YEAR == 2018,] %>%
                     summarize(StateTotal = sum(TotalPoundsChemAppl))
 
 SJVABPounds
-SJVABPounds2 # These are the same...good!
-StateTotal2018
+```
 
+```
+## # A tibble: 1 × 2
+##    YEAR SJVABPounds
+##   <int>       <dbl>
+## 1  2018    3240712.
+```
+
+```r
+SJVABPounds2 # These are the same...good!
+```
+
+```
+## # A tibble: 1 × 2
+##    YEAR SJVABPounds
+##   <int>       <dbl>
+## 1  2018    3240712.
+```
+
+```r
+StateTotal2018
+```
+
+```
+## # A tibble: 1 × 2
+##    YEAR StateTotal
+##   <int>      <dbl>
+## 1  2018   5517621.
+```
+
+```r
 # Calculate percent of pesticides applied in SJVAB counties
 (SJVABPounds$SJVABPounds/StateTotal2018$StateTotal)*100
+```
+
+```
+## [1] 58.73385
+```
+
+```r
 3240712/5517621*100
+```
+
+```
+## [1] 58.73386
 ```
 
 ### - Line graph (trends across years)
 
-```{r Line Graph}
+
+```r
 # Side graph #1
 # Line graph of mean+/- SE pounds applied in each year over time
 # create one line that is whole state, and second line that is counties in SJVAB
@@ -877,8 +1542,21 @@ YrSums <- left_join(x = YrSums, y = SJVABSums, by = "YEAR")
 YrSums2 <- pivot_longer(data = YrSums, cols = c(StateTotal, SJVABTotal), names_to = "Grouping", values_to = "Pounds")
 YrSums2$Grouping <- factor(YrSums2$Grouping, levels = c("StateTotal", "SJVABTotal"))
 head(YrSums2)
+```
 
+```
+## # A tibble: 6 × 3
+##    YEAR Grouping     Pounds
+##   <int> <fct>         <dbl>
+## 1  2008 StateTotal 4947920.
+## 2  2008 SJVABTotal 2580850.
+## 3  2009 StateTotal 5101113.
+## 4  2009 SJVABTotal 2288006.
+## 5  2010 StateTotal 4844894.
+## 6  2010 SJVABTotal 2702536.
+```
 
+```r
 ##############################################
 # Line Graph Showing Pounds Applied Over Time
 ##############################################
@@ -903,14 +1581,18 @@ theme(legend.position = "top",
       axis.title = element_text(size = 23, face = "bold"),
       legend.text = element_text(size = 20),
       panel.grid.major.y = element_line(color = "lightgrey"))
+```
 
+![](CDPR-Copper_files/figure-html/Line Graph-1.png)<!-- -->
 
+```r
 # dev.off()
 ```
 
 ### - Boxplot (trends across months)
 
-```{r Monthly Boxplots}
+
+```r
 # Side Graph # 2
 # Boxplot of Monthly Pesticide Applications
 # Not sure if I want to do boxplot of the whole state, or boxplot of just SJVAB counties...
@@ -922,7 +1604,14 @@ MonthSums <- yrMonCounty %>%
                 drop_na(APPLICATION_MONTH) %>%
                 group_by(APPLICATION_MONTH, YEAR) %>%
                 summarize(StateMonthTotal = sum(TotalPoundsChemAppl))
+```
 
+```
+## `summarise()` has grouped output by 'APPLICATION_MONTH'. You can override using
+## the `.groups` argument.
+```
+
+```r
 # Change months to abbreviations for graphing clarity
 MonthSums$APPLICATION_MONTH <- factor(month.abb[MonthSums$APPLICATION_MONTH], 
                                       levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
@@ -936,7 +1625,14 @@ SJVABMonthSums <- yrMonCounty[yrMonCounty$COUNTY_NAME == "San Joaquin" | yrMonCo
                               yrMonCounty$COUNTY_NAME == "Tulare" | yrMonCounty$COUNTY_NAME == "Kern", ] %>%
                 group_by(APPLICATION_MONTH, YEAR) %>%
                 summarize(SJVABMonthTotal = sum(TotalPoundsChemAppl))
+```
 
+```
+## `summarise()` has grouped output by 'APPLICATION_MONTH'. You can override using
+## the `.groups` argument.
+```
+
+```r
 # Change months to abbreviations for graphing clarity
 SJVABMonthSums$APPLICATION_MONTH <- factor(month.abb[SJVABMonthSums$APPLICATION_MONTH], 
                                            levels = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", 
@@ -985,7 +1681,11 @@ theme(axis.title.y = element_text(size = 18, face = "bold"),
       axis.text.x = element_text(size = 17, color = "black", face = "bold"),
       plot.title = element_text(size = 20, face = "bold", hjust = 0.5),
       panel.grid.major.y = element_line(color = "lightgrey"))
+```
 
+![](CDPR-Copper_files/figure-html/Monthly Boxplots-1.png)<!-- -->
+
+```r
 # dev.off()
 
 
@@ -1016,13 +1716,18 @@ theme(axis.title.y = element_text(size = 18, face = "bold"),
       axis.text.x = element_text(size = 17, color = "black", face = "bold"),
       plot.title = element_text(size = 20, face = "bold", hjust = 0.5),
       panel.grid.major.y = element_line(color = "lightgrey"))
+```
 
+![](CDPR-Copper_files/figure-html/Monthly Boxplots-2.png)<!-- -->
+
+```r
 # dev.off()
 ```
 
 ### - Bar graph (top crops)
 
-```{r Top Crops Bar Graphs}
+
+```r
 # Side Graph # 3
 # Horizontal Bar Chart of top 5 crops with most pesticides used statewide
 # Need to use Mean and SE
@@ -1034,6 +1739,14 @@ StateCrops <- yrMonCountyChemCrop %>%
                     drop_na(SITE_NAME) %>%
                     group_by(SITE_NAME, YEAR) %>%
                     summarize(TotalPounds = sum(TotalPoundsChemAppl))
+```
+
+```
+## `summarise()` has grouped output by 'SITE_NAME'. You can override using the
+## `.groups` argument.
+```
+
+```r
 #                     group_by(YEAR) %>%
 #                     filter(YEAR == 2010) %>%
 #                     top_n(TotalPounds, n = 5)
@@ -1051,6 +1764,14 @@ SJVABCrops <- yrMonCountyChemCrop[yrMonCountyChemCrop$COUNTY_NAME == "San Joaqui
                     drop_na(YEAR) %>%
                     group_by(SITE_NAME, YEAR) %>%
                     summarize(TotalPounds = sum(TotalPoundsChemAppl))
+```
+
+```
+## `summarise()` has grouped output by 'SITE_NAME'. You can override using the
+## `.groups` argument.
+```
+
+```r
 #                     group_by(YEAR) %>%
 #                     filter(YEAR == 2010) %>%
 #                     top_n(TotalPounds, n = 5)
@@ -1084,7 +1805,16 @@ theme(axis.text.y = element_text(size = 15, color = "black", face = "bold"),
       axis.title.x = element_text(size = 15, face = "bold"),
       axis.text.x = element_text(size = 13),
       panel.grid.major.x = element_line(color = "lightgrey"))
+```
 
+```
+## Warning: The dot-dot notation (`..y..`) was deprecated in ggplot2 3.4.0.
+## ℹ Please use `after_stat(y)` instead.
+```
+
+![](CDPR-Copper_files/figure-html/Top Crops Bar Graphs-1.png)<!-- -->
+
+```r
 # dev.off()
 
 ########################################################################
@@ -1112,7 +1842,11 @@ theme(axis.text.y = element_text(size = 15, color = "black", face = "bold"),
       axis.title.x = element_text(size = 15, face = "bold"),
       axis.text.x = element_text(size = 13),
       panel.grid.major.x = element_line(color = "lightgrey"))
+```
 
+![](CDPR-Copper_files/figure-html/Top Crops Bar Graphs-2.png)<!-- -->
+
+```r
 # dev.off()
 ```
 
