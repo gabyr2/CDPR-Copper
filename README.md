@@ -8,3 +8,13 @@ Initially, this work was done for a class's final project, DATA_SCI 7040.  Work 
 > convert_ipynb(input = "C:/Users/gidge/OneDrive - University of Missouri/PhD Thesis Files/Data/CDPR Copper/L8_Exercise.ipynb")
 
 4 Jan 2023: Made repo, pushed code to GitHub, ensured functionality.  Code requires clean-up.
+
+### Notes About Data
+Spatial data are saved in the repo.  
+- The folder `ca_air_basins` contains spatial files for the polygons of the Air Basins of California.
+- The folder `Statewide_CA_PLSS_NAD83AlbersCA` contains spatial files for the PLSS data.
+
+CDPR data are *NOT* saved in the repo.
+- File name: `CalPIP_Cu_2008-2021.csv`
+- The file is too large for github (>100MB).
+- It is saved on the external hard drive: `D:/LocalRepos/CDPR-Copper_ExternalData`
