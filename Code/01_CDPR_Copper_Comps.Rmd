@@ -16,7 +16,8 @@ library(RColorBrewer) # for viz
 
 # For spatial work
 library(sf)
-
+library(mapview) # plotting
+library(leafpop) # for customizing popups on maps
 ```
 
 ## Read in Data: CDPR
@@ -191,20 +192,18 @@ rice %>%
   facet_wrap(~COUNTY_NAME) +
   theme_bw()
 
-rice %>%
+yrly_app <- 
+  rice %>%
   group_by(YEAR, COUNTY_NAME) %>%
-  summarize(mean = mean(sum(POUNDS_CHEMICAL_APPLIED)))
+  summarize(total = mean(sum(POUNDS_CHEMICAL_APPLIED)))
 
-test <- 
 rice %>%
   group_by(YEAR, COUNTY_NAME) %>%
   summarize(sum = sum(POUNDS_CHEMICAL_APPLIED)) %>%
   group_by(COUNTY_NAME) %>%
-  summarize(mean = mean(sum))
+  summarize(mean = mean(sum),
+            sd = sd(sum))
 
-test %>%
-  group_by(COUNTY_NAME) %>%
-  summarize(mean = mean(sum))
 ```
 
 
@@ -267,14 +266,14 @@ plss_tr <- plss %>%
 ```
 
 
-## Remove CDPR and PLSS objects to save memory
+## Remove CDPR object to save memory
 ```{r Remove CDPR and PLSS}
-rm(cdpr, plss)
+rm(cdpr)
 
 ```
 
 
-## Creating NA data for every township/range and County
+## Creating NA data for every township/range and County: not necessary
 ```{r}
 
 # Will need to create NA data for every township/section to be able to map the data
@@ -301,25 +300,93 @@ rice_sum_tr <- rice %>%
 # rice_sum_t <- left_join(x = rice_sum_t, y = rice[, c("COMTRS", "COUNTY_NAME", "Township")], by = "Township")
 
 
-# Joined dataset with one year
+# Joined datasets year by year
+plss_rice_tr2008 <- left_join(x = plss_tr, 
+                              y = rice_sum_tr[rice_sum_tr$YEAR == 2008, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2008))
+
+plss_rice_tr2009 <- left_join(x = plss_tr, 
+                              y = rice_sum_tr[rice_sum_tr$YEAR == 2009, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2009))
+
+plss_rice_tr2010 <- left_join(x = plss_tr, 
+                              y = rice_sum_tr[rice_sum_tr$YEAR == 2010, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2010))
+
+plss_rice_tr2011 <- left_join(x = plss_tr, 
+                              y = rice_sum_tr[rice_sum_tr$YEAR == 2011, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2011))
+
+plss_rice_tr2012 <- left_join(x = plss_tr, 
+                              y = rice_sum_tr[rice_sum_tr$YEAR == 2012, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2012))
+
+plss_rice_tr2013 <- left_join(x = plss_tr, 
+                              y = rice_sum_tr[rice_sum_tr$YEAR == 2013, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2013))
+
+plss_rice_tr2014 <- left_join(x = plss_tr, 
+                              y = rice_sum_tr[rice_sum_tr$YEAR == 2014, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2014))
+
+plss_rice_tr2015 <- left_join(x = plss_tr, 
+                              y = rice_sum_tr[rice_sum_tr$YEAR == 2015, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2015))
+
+plss_rice_tr2016 <- left_join(x = plss_tr, 
+                              y = rice_sum_tr[rice_sum_tr$YEAR == 2016, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2016))
+
+plss_rice_tr2017 <- left_join(x = plss_tr, 
+                              y = rice_sum_tr[rice_sum_tr$YEAR == 2017, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2017))
+
+plss_rice_tr2018 <- left_join(x = plss_tr, 
+                              y = rice_sum_tr[rice_sum_tr$YEAR == 2018, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2018))
+
+plss_rice_tr2019 <- left_join(x = plss_tr, 
+                              y = rice_sum_tr[rice_sum_tr$YEAR == 2019, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2019))
+
+plss_rice_tr2020 <- left_join(x = plss_tr, 
+                              y = rice_sum_tr[rice_sum_tr$YEAR == 2020, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2020))
+
 plss_rice_tr2021 <- left_join(x = plss_tr, 
                               y = rice_sum_tr[rice_sum_tr$YEAR == 2021, ], 
-                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME"))
-# plss_rice <- plss_rice %>%
-#   distinct(.keep_all = TRUE) 
-
-# plss_rice_t <- plss_rice_t %>%
-#   complete(TOWNSHIP, geometry, YEAR) %>%
-#   drop_na(YEAR)
-
-plss_rice_tr2021 <- plss_rice_tr2021 %>%
-  mutate(sum_lbs_applied = replace_na(sum_lbs_applied, 0))
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2021))
 
 
 
-# Test to print just one county, facet by Year
+# This may not be necessary:
+
+# plss_rice_tr2021 <- plss_rice_tr2021 %>%
+#   mutate(sum_lbs_applied = replace_na(sum_lbs_applied, 0))
+
+
+plss_rice_tr_all <- bind_rows(plss_rice_tr2008, plss_rice_tr2009, plss_rice_tr2010, plss_rice_tr2011, plss_rice_tr2012,
+                              plss_rice_tr2013, plss_rice_tr2014, plss_rice_tr2015, plss_rice_tr2016, plss_rice_tr2017,
+                              plss_rice_tr2018, plss_rice_tr2019, plss_rice_tr2020, plss_rice_tr2021)
+
+
+# Test to print just one year of data
 ggplot() +
-  geom_sf(data = plss_rice_tr2021, 
+  geom_sf(data = plss_rice_tr_all[plss_rice_tr_all$YEAR == 2021,], 
           aes(geometry = geometry, fill = sum_lbs_applied)) + 
   theme_bw() + 
   coord_sf() +
@@ -346,138 +413,206 @@ allCu_sum_tr <- allCu %>%
 # rice_sum_t <- left_join(x = rice_sum_t, y = rice[, c("COMTRS", "COUNTY_NAME", "Township")], by = "Township")
 
 
-# Joined dataset with one year
-plss_allCu_tr2021 <- left_join(x = plss_tr, 
-                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2021, ], 
-                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME"))
-
+# Joined datasets year by year
 plss_allCu_tr2008 <- left_join(x = plss_tr, 
                               y = allCu_sum_tr[allCu_sum_tr$YEAR == 2008, ], 
-                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME"))
-# plss_rice <- plss_rice %>%
-#   distinct(.keep_all = TRUE) 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2008))
 
-# plss_rice_t <- plss_rice_t %>%
-#   complete(TOWNSHIP, geometry, YEAR) %>%
-#   drop_na(YEAR)
+plss_allCu_tr2009 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2009, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2009))
+
+plss_allCu_tr2010 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2010, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2010))
+
+plss_allCu_tr2011 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2011, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2011))
+
+plss_allCu_tr2012 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2012, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2012))
+
+plss_allCu_tr2013 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2013, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2013))
+
+plss_allCu_tr2014 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2014, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2014))
+
+plss_allCu_tr2015 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2015, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2015))
+
+plss_allCu_tr2016 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2016, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2016))
+
+plss_allCu_tr2017 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2017, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2017))
+
+plss_allCu_tr2018 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2018, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2018))
+
+plss_allCu_tr2019 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2019, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2019))
+
+plss_allCu_tr2020 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2020, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2020))
+
+plss_allCu_tr2021 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2021, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2021))
 
 
 
-# Actually looks better without converting to 0
-# Or need to change visualization in ggplot so that 0 values are colored grey
-plss_allCu_tr2021 <- plss_allCu_tr2021 %>%
-  mutate(sum_lbs_applied = replace_na(sum_lbs_applied, 0))
+# This may not be necessary:
 
-plss_allCu_tr2008 <- plss_allCu_tr2008 %>%
-  mutate(sum_lbs_applied = replace_na(sum_lbs_applied, 0))
+# plss_rice_tr2021 <- plss_rice_tr2021 %>%
+#   mutate(sum_lbs_applied = replace_na(sum_lbs_applied, 0))
 
 
-# Test to print 
+plss_allCu_tr_all <- bind_rows(plss_allCu_tr2008, plss_allCu_tr2009, plss_allCu_tr2010, plss_allCu_tr2011, plss_allCu_tr2012,
+                               plss_allCu_tr2013, plss_allCu_tr2014, plss_allCu_tr2015, plss_allCu_tr2016, plss_allCu_tr2017,
+                               plss_allCu_tr2018, plss_allCu_tr2019, plss_allCu_tr2020, plss_allCu_tr2021)
+
+
+# Test to print just one year of data
 ggplot() +
-  geom_sf(data = plss_allCu_tr2021, 
+  geom_sf(data = plss_allCu_tr_all[plss_allCu_tr_all$YEAR == 2021,], 
           aes(geometry = geometry, fill = sum_lbs_applied)) + 
   theme_bw() + 
   coord_sf() +
   # facet_wrap(~YEAR) +
-  scale_fill_distiller(name = "Total Pounds in 2021",
+  scale_fill_distiller(name = "Total Pounds",
                      labels = comma,
                      trans = "reverse",
                      palette = "Oranges")
 ```
 
+
+# Mapview Package
 ```{r}
-# Make joined datasets for each year, then bind_rows
+# install.packages("mapview")
+library(mapview)
 
-# Summarize for whole state
-allCu_sum <- allCu %>%
-  group_by(YEAR, COUNTY_NAME, COMTRS) %>%
-  summarise(sum_lbs_applied = sum(POUNDS_CHEMICAL_APPLIED))
+# Create palette to use
+pal <- brewer.pal(n = 9, "Oranges")
 
-plss_allCu2008 <- full_join(x = plss, y = allCu_sum[allCu_sum$YEAR == "2008",], by = c("CO_MTRS" = "COMTRS"))
-plss_allCu2008 <- plss_allCu2008 %>%
-  complete(CO_MTRS, YEAR)
+# Convert counties sf data from polygon to line
+plss_co_lines <- st_cast(plss_co, to = "MULTILINESTRING")
 
-plss_rice2009 <- full_join(x = plss, y = rice_sum[rice_sum$YEAR == "2009",], by = c("CO_MTRS" = "COMTRS"))
-plss_rice2009 <- plss_rice2009 %>%
-  distinct(.keep_all = TRUE)
+allCu_map <- 
+  mapview(plss_allCu_tr_all[plss_allCu_tr_all$YEAR == 2021,],
+          zcol = "sum_lbs_applied",
+          col.region = pal,
+          layer.name = "Total Pounds Cu Applied in 2021",
+          popup = popupTable(plss_allCu_tr_all[plss_allCu_tr_all$YEAR == 2021,],
+                             zcol = c("NAME", "TownshipRa", "sum_lbs_applied"))) + 
+  mapview(plss_co_lines,
+          color = "black", lwd = 1.5, legend = FALSE)
 
-plss_rice2010 <- full_join(x = plss, y = rice_sum[rice_sum$YEAR == "2010",], by = c("CO_MTRS" = "COMTRS"))
-plss_rice2010 <- plss_rice2010 %>%
-  distinct(.keep_all = TRUE)      
-
-plss_rice2011 <- full_join(x = plss, y = rice_sum[rice_sum$YEAR == "2011",], by = c("CO_MTRS" = "COMTRS"))
-plss_rice2011 <- plss_rice2011 %>%
-  distinct(.keep_all = TRUE)
-
-plss_rice2012 <- full_join(x = plss, y = rice_sum[rice_sum$YEAR == "2012",], by = c("CO_MTRS" = "COMTRS"))
-plss_rice2012 <- plss_rice2012 %>%
-  distinct(.keep_all = TRUE)
-
-plss_rice2013 <- full_join(x = plss, y = rice_sum[rice_sum$YEAR == "2013",], by = c("CO_MTRS" = "COMTRS"))
-plss_rice2013 <- plss_rice2013 %>%
-  distinct(.keep_all = TRUE)
-
-plss_rice2014 <- full_join(x = plss, y = rice_sum[rice_sum$YEAR == "2014",], by = c("CO_MTRS" = "COMTRS"))
-plss_rice2014 <- plss_rice2014 %>%
-  distinct(.keep_all = TRUE)
-
-plss_rice2015 <- full_join(x = plss, y = rice_sum[rice_sum$YEAR == "2015",], by = c("CO_MTRS" = "COMTRS"))
-plss_rice2015 <- plss_rice2015 %>%
-  distinct(.keep_all = TRUE)
-
-plss_rice2016 <- full_join(x = plss, y = rice_sum[rice_sum$YEAR == "2016",], by = c("CO_MTRS" = "COMTRS"))
-plss_rice2016 <- plss_rice2016 %>%
-  distinct(.keep_all = TRUE)
-
-plss_rice2017 <- full_join(x = plss, y = rice_sum[rice_sum$YEAR == "2017",], by = c("CO_MTRS" = "COMTRS"))
-plss_rice2017 <- plss_rice2017 %>%
-  distinct(.keep_all = TRUE)
-
-plss_rice2018 <- full_join(x = plss, y = rice_sum[rice_sum$YEAR == "2018",], by = c("CO_MTRS" = "COMTRS"))
-plss_rice2018 <- plss_rice2018 %>%
-  distinct(.keep_all = TRUE)
-
-plss_rice2019 <- full_join(x = plss, y = rice_sum[rice_sum$YEAR == "2019",], by = c("CO_MTRS" = "COMTRS"))
-plss_rice2019 <- plss_rice2019 %>%
-  distinct(.keep_all = TRUE)
-
-plss_rice2020 <- full_join(x = plss, y = rice_sum[rice_sum$YEAR == "2020",], by = c("CO_MTRS" = "COMTRS"))
-plss_rice2020 <- plss_rice2020 %>%
-  distinct(.keep_all = TRUE)
-
-plss_rice2021 <- full_join(x = plss, y = rice_sum[rice_sum$YEAR == "2021",], by = c("CO_MTRS" = "COMTRS"))
-plss_rice2021 <- plss_rice2021 %>%
-  distinct(.keep_all = TRUE)
-
-# Test to print just one county from each year's dataset
-ggplot() +
-  geom_sf(data = plss_allCu2008, 
-          aes(geometry = geometry, fill = sum_lbs_applied)) + 
-  theme_bw() + 
-  coord_sf() +
-  scale_fill_distiller(name = "Total Pounds",
-                     labels = comma,
-                     trans = "reverse", 
-                     palette = "Oranges")
+mapshot(allCu_map, url = paste0(getwd(), "/allCu_map.html"))
 
 
-plss_rice_all <- bind_rows(plss_rice2008, plss_rice2009, plss_rice2010, plss_rice2011, plss_rice2012,
-                           plss_rice2013, plss_rice2014, plss_rice2015, plss_rice2016, plss_rice2017,
-                           plss_rice2018, plss_rice2019, plss_rice2020, plss_rice2021)
-
-plss_rice_mean <- plss_rice_all %>%
-  group_by(CO_MTRS, NAME) %>%
-  summarize(mean = mean(sum_lbs_applied))
-
-
-ggplot() +
-  geom_sf(data = plss_rice_mean[plss_rice_all$NAME == "Butte",], aes(fill = mean(sum_lbs_applied))) + 
-  theme_bw() + 
-  coord_sf() +
-  # facet_wrap(~YEAR) + 
-  scale_fill_distiller(name = "Total Pounds",
-                     labels = comma,
-                     trans = "reverse", 
-                     palette = "Oranges")
 ```
 
+
+# Mapview Package With PopupGraph
+```{r}
+# install.packages("mapview")
+library(mapview)
+
+# Create palette to use
+# pal <- brewer.pal(n = 9, "Oranges")
+
+# Convert counties sf data from polygon to line
+# plss_co_lines <- st_cast(plss_co, to = "MULTILINESTRING")
+
+# Create the popupGraphs
+# This is draft code for a piechart
+# ggplot(data = allCu[allCu$YEAR == 2021 & allCu$TownshipRa == "47N 05E",],
+#        aes(x = "", y = POUNDS_CHEMICAL_APPLIED, fill = SITE_NAME)) + 
+#   geom_bar(stat = "identity", width = 1) + 
+#   coord_polar("y", start = 0) +
+#   theme_void()
+
+p <- ggplot(data = plss_allCu_tr_all,
+            aes(x = YEAR, y = sum_lbs_applied)) + 
+  geom_bar(stat = "identity") + 
+  theme_bw()
+
+p <- mget(rep("p", length(unique(plss_allCu_tr_all$TownshipRa))))
+
+
+clr <- rep("grey", length(unique(plss_allCu_tr_all$TownshipRa)))
+p <- lapply(1:length(p), function(i) {
+  clr[i] <- "red"
+  update(p[[i]], col = clr)
+})
+
+
+
+
+allCu_map <- 
+  mapview(plss_allCu_tr_all[plss_allCu_tr_all$YEAR == 2021,],
+          zcol = "sum_lbs_applied",
+          col.region = pal,
+          layer.name = "Total Pounds Cu Applied in 2021",
+          popup = popupTable(plss_allCu_tr_all[plss_allCu_tr_all$YEAR == 2021,],
+                             zcol = c("NAME", "TownshipRa", "sum_lbs_applied"))) + 
+  mapview(plss_co_lines,
+          color = "black", lwd = 1.5, legend = FALSE)
+
+mapshot(allCu_map, url = paste0(getwd(), "/allCu_map.html"))
+
+
+```
+
+
+# Testing code from https://r-spatial.github.io/mapview/articles/mapview_04-popups.html#graph-popups
+```{r}
+library(lattice)
+library(sp)
+
+data(meuse)
+coordinates(meuse) <- ~x+y
+proj4string(meuse) <- CRS("+init=epsg:28992")
+p <- xyplot(copper ~ cadmium, data = meuse@data, col = "grey", pch = 20, cex = 2)
+p <- mget(rep("p", length(meuse)))
+
+clr <- rep("grey", length(meuse))
+p <- lapply(1:length(p), function(i) {
+  clr[i] <- "red"
+  update(p[[i]], col = clr)
+})
+
+
+mapview(meuse,
+        zcol = "cadmium",
+        popup = popupGraph(p))
+```
+
+## NOTES
+* need to clean up dataset
+  - Fresno Co, TR: 12S 31E is WRONG (probably a typo that should have been 12S 21E)
