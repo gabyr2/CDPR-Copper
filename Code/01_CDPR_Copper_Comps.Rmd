@@ -100,6 +100,109 @@ rice <- rice %>%
   filter(!is.na(APPLICATION_MONTH))
 ```
 
+### Read in 1990-2007 Data and bind to rice df
+```{r Read in 1990-2007 data and bind}
+
+earlyrice <- read_csv("D:/LocalRepos/CDPR-Copper_ExternalData/CalPIP_Cu_Rice_1990-2007.csv")
+
+# For now, I'm just making this a separate df from the below stuff so that the mapping code doesn't get messed up.  Eventually need to incorporate all years into the mapping df though for rice.
+
+names(rice)
+names(earlyrice)
+
+earlyrice <- earlyrice[ , -c(1, 3)]
+
+rice_all <- bind_rows(rice, earlyrice)
+```
+
+#### rice_all: Clean up column info and plots
+```{r rice_all: Clean up}
+
+# Quick column clean-up
+rice_all$APPLICATION_MONTH <- factor(str_to_title(rice_all$APPLICATION_MONTH),
+                                  levels = c("January", "February", "March", "April", "May", "June", 
+                                             "July", "August", "September", "October", "November", "December"))
+rice_all$COUNTY_NAME <- factor(str_to_title(rice_all$COUNTY_NAME))
+rice_all$CHEMICAL_NAME <- factor(str_to_title(rice_all$CHEMICAL_NAME))
+rice_all$SITE_NAME <- factor(str_to_title(rice_all$SITE_NAME))
+rice_all$PRODUCT_NAME <- factor(str_to_title(rice_all$PRODUCT_NAME))
+
+# Convert pounds to kilograms
+rice_all <- rice_all %>%
+  mutate(KG_CHEMICAL_APPLIED = POUNDS_CHEMICAL_APPLIED*0.4535924,
+         .after = POUNDS_CHEMICAL_APPLIED)
+
+# Convert pounds chemical to pounds copper
+rice_all <- rice_all %>%
+  mutate(Cu_Conversion = case_when(CHEMICAL_NAME == "Copper Sulfate (Pentahydrate)" ~ 0.2545,
+                                   CHEMICAL_NAME == "Copper" ~ 1,
+                                   CHEMICAL_NAME == "Copper Sulfate (Basic)" ~ 0.4929,
+                                   CHEMICAL_NAME == "Copper Hydroxide" ~ 0.6513,
+                                   CHEMICAL_NAME == "Copper Oxychloride" ~ 0.2975,
+                                   CHEMICAL_NAME == "Copper Sulfate (Anhydrous)" ~ 0.3981,
+                                   CHEMICAL_NAME == "Copper Diammonium Diacetate Complex" ~ 0.08),
+         .after = KG_CHEMICAL_APPLIED)
+
+rice_all <- rice_all %>%
+  mutate(KG_COPPER_APPLIED = KG_CHEMICAL_APPLIED*Cu_Conversion,
+         .after = Cu_Conversion)
+```
+
+```{r rice_all: Plots}
+# Plotting for Comps Proposal
+
+# Plot of KG_CHEMICAL_APPLIED
+rice_all %>%
+  group_by(YEAR) %>%
+  summarize(KG_CHEMICAL_APPLIED) %>%
+  ggplot(aes(x = factor(YEAR), y = KG_CHEMICAL_APPLIED)) + 
+  stat_summary(fun = "sum", geom = "bar", aes(fill = after_stat(y)), show.legend = TRUE) + 
+  # geom_bar(stat = "identity") + 
+  labs(x = "", y = "Kilograms of Chemical Applied", fill = "") +
+  scale_x_discrete(breaks = c("1990", "1995", "2000", "2005", "2010", "2015", "2020")) +
+  scale_y_continuous(labels = scales::comma,
+                     expand = expansion(mult = c(0, 0.05))) +
+  scale_fill_distiller(palette = "Oranges",
+                       trans = "reverse",
+                       labels = scales::comma) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 15),
+        axis.title.y = element_text(size = 20, 
+                                    margin = margin(t = 0, b = 0, l = 0, r = 10))) + 
+  guides(fill = guide_colorbar(reverse = TRUE))
+
+
+# Plot of KG_COPPER_APPLIED
+rice_all %>%
+  group_by(YEAR) %>%
+  summarize(KG_COPPER_APPLIED) %>%
+  ggplot(aes(x = factor(YEAR), y = KG_COPPER_APPLIED)) + 
+  stat_summary(fun = "sum", geom = "bar", aes(fill = after_stat(y)), show.legend = TRUE) + 
+  # geom_bar(stat = "identity") + 
+  labs(x = "", y = "Kilograms of Copper Applied", fill = "") +
+  scale_x_discrete(breaks = c("1990", "1995", "2000", "2005", "2010", "2015", "2020")) +
+  scale_y_continuous(labels = scales::comma,
+                     expand = expansion(mult = c(0, 0.05))) +
+  scale_fill_distiller(palette = "Oranges",
+                       trans = "reverse",
+                       labels = scales::comma) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 15),
+        axis.title.y = element_text(size = 20, 
+                                    margin = margin(t = 0, b = 0, l = 0, r = 10))) + 
+  guides(fill = guide_colorbar(reverse = TRUE))
+
+rice_all %>%
+  group_by(YEAR, COUNTY_NAME) %>%
+  summarize(POUNDS_CHEMICAL_APPLIED) %>%
+  ggplot(aes(x = factor(YEAR), y = POUNDS_CHEMICAL_APPLIED)) + 
+  geom_bar(stat = "identity") +
+  facet_wrap(~COUNTY_NAME) +
+  theme_bw()
+
+```
+
+
 ### Clean up column info
 ```{r Clean up column info}
 # Change all to title case and assign as factors
