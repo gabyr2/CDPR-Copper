@@ -297,18 +297,19 @@ allCu %>%
   ggplot(aes(x = factor(YEAR), y = KG_CHEMICAL_APPLIED, fill = factor(RICE))) + 
   # stat_summary(fun = "sum", geom = "bar", show.legend = TRUE) + 
   geom_bar(stat = "identity", position = "stack") +
-  labs(x = "", y = "Kilograms of Chemical Applied", fill = "Rice Crop?") +
+  labs(x = "", y = "Kilograms of Chemical Applied", fill = "") +
   scale_x_discrete(breaks = c("1990", "1995", "2000", "2005", "2010", "2015", "2020")) +
   scale_y_continuous(labels = scales::comma,
                      expand = expansion(mult = c(0, 0.05))) +
-  # scale_fill_distiller(palette = "Oranges",
-  #                      trans = "reverse",
-  #                      labels = scales::comma) +
+  scale_fill_manual(values = c("#fdae6b", "#e6550d"),
+                    labels = c("Other Crops", "Rice")) +
   theme_bw() +
   theme(axis.text = element_text(size = 15),
         axis.title.y = element_text(size = 20, 
-                                    margin = margin(t = 0, b = 0, l = 0, r = 10))) + 
-  guides(fill = guide_colorbar(reverse = TRUE))
+                                    margin = margin(t = 0, b = 0, l = 0, r = 10)),
+        legend.text = element_text(size = 13),
+        legend.position = c(0.9, 0.9))
+
 
 # Plot of KG_CHEMICAL_APPLIED, split by all crops
 allCu %>%
@@ -492,14 +493,15 @@ plss_tr <- plss %>%
 ```
 
 
-## Remove CDPR object to save memory
-```{r Remove CDPR and PLSS}
-rm(cdpr)
+## Remove CDPR objects to save memory
+```{r Remove CDPR objects}
+rm(cdpr, cdpr1, cdpr2, cdpr3)
 
 ```
 
 
 ## Creating NA data for every township/range and County: not necessary
+This is actually not necessary because by leaving these township-range values as "NA", they will be plotted as grey, rather than as a light orange as part of the palette because they would be seen as 0.  Visually, having the NA (i.e., 0) values as grey helps the township-ranges with actual values to stand out better.  
 ```{r}
 
 # Will need to create NA data for every township/section to be able to map the data
@@ -633,7 +635,10 @@ ggplot() +
 allCu_sum_tr <- allCu %>%
   drop_na(Meridian) %>%
   group_by(YEAR, COUNTY_NAME, TownshipRa) %>%
-  summarise(sum_lbs_applied = sum(POUNDS_CHEMICAL_APPLIED))
+  summarise(sum_kg_applied = sum(KG_CHEMICAL_APPLIED))
+
+# Change TownshipRa 12S 31E to 12S 21E.  This was likely a typo, because it says that there was 1 application on peaches, but it is clear from the map that this is very mountainous terrain and is actually part of Kings Canyon NP.  I'm assuming that this was a typo, and instead of 31E it should be 21E, where there actually is farmland.
+allCu_sum_tr$TownshipRa[allCu_sum_tr$TownshipRa == "12S 31E"] <- "12S 21E"
 
 # Add COMTRS column to rice_sum, DO I NEED TO DO THIS??
 # rice_sum_t <- left_join(x = rice_sum_t, y = rice[, c("COMTRS", "COUNTY_NAME", "Township")], by = "Township")
@@ -734,6 +739,30 @@ ggplot() +
                      labels = comma,
                      trans = "reverse",
                      palette = "Oranges")
+
+# Plot when using just 2021 dataframe
+library(extrafont)
+library(extrafontdb)
+# font_import()   # Run once
+loadfonts(device = "win")
+
+# To get the degree symbol to work: Tools -> Graphics -> Backend -> Cairo
+
+ggplot() +
+  geom_sf(data = plss_allCu_tr2021, 
+          aes(geometry = geometry, fill = sum_kg_applied)) + 
+  theme_bw() + 
+  coord_sf() +
+  scale_fill_distiller(name = "Total Kilograms",
+                     labels = comma,
+                     trans = "reverse",
+                     palette = "Oranges",
+                     na.value = "grey") +
+  theme(text = element_text(family = "Lato"),
+        legend.position = c(0.7, 0.75),
+        axis.text = element_text(size = 15),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15))
 ```
 
 
