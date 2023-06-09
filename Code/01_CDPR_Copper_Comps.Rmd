@@ -23,8 +23,17 @@ library(leafpop) # for customizing popups on maps
 ## Read in Data: CDPR
 ```{r Read in Data: CDPR}
 
-cdpr <- read_csv("D:/LocalRepos/CDPR-Copper_ExternalData/CalPIP_Cu_2008-2021.csv")
+# Cu for all crops for 1990-2006
+cdpr1 <- read_csv("D:/LocalRepos/CDPR-Copper_ExternalData/CalPIP_Cu_1990-2006.csv")
 
+# Cu for all crops for 2007
+cdpr2 <- read_csv("D:/LocalRepos/CDPR-Copper_ExternalData/CalPIP_Cu_2007.csv")
+
+# All crops for 2008-2021
+cdpr3 <- read_csv("D:/LocalRepos/CDPR-Copper_ExternalData/CalPIP_Cu_2008-2021.csv")
+
+# Bind them all together
+cdpr <- bind_rows(cdpr1, cdpr2, cdpr3)
 ```
 
 ## CDPR Data Clean-up
@@ -38,13 +47,18 @@ sites <- cdpr %>% count(SITE_NAME)
 allCu <- cdpr %>% 
   filter(SITE_NAME != "" & 
            SITE_NAME != "AIRPORTS AND LANDING FIELDS (RUNWAYS, ETC.)" & 
+           SITE_NAME != "ANIMAL HUSBANDRY PREMISES" & 
            SITE_NAME != "ANTIFOULING TREATMENT SITES (ALL OR UNSPEC)" & 
            SITE_NAME != "AQUATIC AREAS, WATER AREAS (ALL OR UNSPEC)" & 
+           SITE_NAME != "AQUATIC SITE - HUMAN/ANIMAL USE (COMBINED SITE)" &
            SITE_NAME != "AQUATIC SITE - INDUSTRIAL USE (COMBINED SITE)" & 
            SITE_NAME != "BUILDINGS AND STRUCTURES (NON-AG OUTDOOR)" & 
+           SITE_NAME != "CANNABIS (ALL OR UNSPECIFIED)" &
+           SITE_NAME != "COMMERCIAL, INSTITUTIONAL OR INDUSTRIAL AREAS" &
            SITE_NAME != "COMMODITY FUMIGATION" & 
            SITE_NAME != "COUNTY AG. COMM. SALES" & 
            SITE_NAME != "FUMIGATION, OTHER" & 
+           SITE_NAME != "GREENHOUSES (EMPTY) (ENVIRONS, BENCHES, ETC.)" & 
            SITE_NAME != "HUMAN DRINKING WATER SYSTEMS (POTABLE)" & 
            SITE_NAME != "INDUSTRIAL PROCESSING WATER" & 
            SITE_NAME != "INDUSTRIAL WASTE DISPOSAL SYSTEMS, DISPOSAL WATER" & 
@@ -64,90 +78,99 @@ allCu <- cdpr %>%
            SITE_NAME != "RIGHTS OF WAY" & 
            # SITE_NAME != "SOIL APPLICATION, PREPLANT-OUTDOOR (SEEDBEDS,ETC.)" & 
            SITE_NAME != "STRUCTURAL PEST CONTROL" & 
+           SITE_NAME != "SWIMMING POOL WATER SYSTEMS (POOLS, SPAS, ETC.)" & 
            SITE_NAME != "TURF, GOLF COURSE (FAIRWAYS, GREENS, ROUGH)" & 
            # SITE_NAME != "UNCULTIVATED AGRICULTURAL AREAS (ALL OR UNSPEC)" & 
            SITE_NAME != "UNCULTIVATED NON-AG AREAS (ALL OR UNSPEC)" & 
+           SITE_NAME != "URBAN AREAS (ALL OR UNSPEC) (RESIDENTIAL, ETC.)" & 
            SITE_NAME != "VERTEBRATE PEST CONTROL" & 
            SITE_NAME != "WOOD PROTECTION TREATMENTS (ALL OR UNSPECIFIED)")
 
 
-# Create df with rice-related SITE values only (total 14731 rows)
-rice <- cdpr %>%
-  filter(SITE_NAME == "RICE (ALL OR UNSPEC)" | SITE_NAME == "RICE, WILD (GRAIN CROP)")
+# Create df with rice-related SITE values only (total 65157 rows).  NOT REQUIRED TO DO THIS YET.
+# rice <- cdpr %>%
+#   filter(SITE_NAME == "RICE (ALL OR UNSPEC)" | SITE_NAME == "RICE, WILD (GRAIN CROP)")
 
 
 # Remove unnecessary columns
 allCu <- allCu[,-c(1, 3)]
-rice <- rice[,-c(1, 3)]
+# rice <- rice[,-c(1, 3)]
 
-# Remove NA, blank values
-sum(is.na(allCu$POUNDS_CHEMICAL_APPLIED))
-sum(is.na(allCu$APPLICATION_MONTH))
-sum(allCu$POUNDS_CHEMICAL_APPLIED == "")
-sum(allCu$APPLICATION_MONTH == "")
-
-sum(is.na(rice$POUNDS_CHEMICAL_APPLIED))
-sum(is.na(rice$APPLICATION_MONTH))
-sum(rice$POUNDS_CHEMICAL_APPLIED == "")
-sum(rice$APPLICATION_MONTH == "")
-
-allCu <- allCu %>%
-  filter(!is.na(POUNDS_CHEMICAL_APPLIED)) %>%
-  filter(!is.na(APPLICATION_MONTH))
-
-rice <- rice %>%
-  filter(!is.na(POUNDS_CHEMICAL_APPLIED)) %>%
-  filter(!is.na(APPLICATION_MONTH))
+# Remove NA, blank values.  NOT NEEDED FOR RICE ONLY DF
+# sum(is.na(allCu$POUNDS_CHEMICAL_APPLIED))
+# sum(is.na(allCu$APPLICATION_MONTH))
+# sum(allCu$POUNDS_CHEMICAL_APPLIED == "")
+# sum(allCu$APPLICATION_MONTH == "")
+# 
+# sum(is.na(rice$POUNDS_CHEMICAL_APPLIED))
+# sum(is.na(rice$APPLICATION_MONTH))
+# sum(rice$POUNDS_CHEMICAL_APPLIED == "")
+# sum(rice$APPLICATION_MONTH == "")
+# 
+# allCu <- allCu %>%
+#   filter(!is.na(POUNDS_CHEMICAL_APPLIED)) %>%
+#   filter(!is.na(APPLICATION_MONTH))
+# 
+# rice <- rice %>%
+#   filter(!is.na(POUNDS_CHEMICAL_APPLIED)) %>%
+#   filter(!is.na(APPLICATION_MONTH))
 ```
 
-### Read in 1990-2007 Data and bind to rice df
+### Read in 1990-2007 Data and bind to rice df.  No longer required, I added 1990-2021 data for all crops
 ```{r Read in 1990-2007 data and bind}
 
-earlyrice <- read_csv("D:/LocalRepos/CDPR-Copper_ExternalData/CalPIP_Cu_Rice_1990-2007.csv")
-
-# For now, I'm just making this a separate df from the below stuff so that the mapping code doesn't get messed up.  Eventually need to incorporate all years into the mapping df though for rice.
-
-names(rice)
-names(earlyrice)
-
-earlyrice <- earlyrice[ , -c(1, 3)]
-
-rice_all <- bind_rows(rice, earlyrice)
+# earlyrice <- read_csv("D:/LocalRepos/CDPR-Copper_ExternalData/CalPIP_Cu_Rice_1990-2007.csv")
+# 
+# # For now, I'm just making this a separate df from the below stuff so that the mapping code doesn't get messed up.  Eventually need to incorporate all years into the mapping df though for rice.
+# 
+# names(rice)
+# names(earlyrice)
+# 
+# earlyrice <- earlyrice[ , -c(1, 3)]
+# 
+# rice_all <- bind_rows(rice, earlyrice)
 ```
 
-#### rice_all: Clean up column info and plots
-```{r rice_all: Clean up}
+#### Clean up column info and plots
+```{r Clean up, Convert to kg}
 
+### For all crops df first:
 # Quick column clean-up
-rice_all$APPLICATION_MONTH <- factor(str_to_title(rice_all$APPLICATION_MONTH),
+allCu$APPLICATION_MONTH <- factor(str_to_title(allCu$APPLICATION_MONTH),
                                   levels = c("January", "February", "March", "April", "May", "June", 
                                              "July", "August", "September", "October", "November", "December"))
-rice_all$COUNTY_NAME <- factor(str_to_title(rice_all$COUNTY_NAME))
-rice_all$CHEMICAL_NAME <- factor(str_to_title(rice_all$CHEMICAL_NAME))
-rice_all$SITE_NAME <- factor(str_to_title(rice_all$SITE_NAME))
-rice_all$PRODUCT_NAME <- factor(str_to_title(rice_all$PRODUCT_NAME))
+allCu$COUNTY_NAME <- factor(str_to_title(allCu$COUNTY_NAME))
+allCu$CHEMICAL_NAME <- factor(str_to_title(allCu$CHEMICAL_NAME))
+allCu$SITE_NAME <- factor(str_to_title(allCu$SITE_NAME))
+allCu$PRODUCT_NAME <- factor(str_to_title(allCu$PRODUCT_NAME))
 
 # Convert pounds to kilograms
-rice_all <- rice_all %>%
+allCu <- allCu %>%
   mutate(KG_CHEMICAL_APPLIED = POUNDS_CHEMICAL_APPLIED*0.4535924,
          .after = POUNDS_CHEMICAL_APPLIED)
 
 # Convert pounds chemical to pounds copper
-rice_all <- rice_all %>%
-  mutate(Cu_Conversion = case_when(CHEMICAL_NAME == "Copper Sulfate (Pentahydrate)" ~ 0.2545,
-                                   CHEMICAL_NAME == "Copper" ~ 1,
-                                   CHEMICAL_NAME == "Copper Sulfate (Basic)" ~ 0.4929,
-                                   CHEMICAL_NAME == "Copper Hydroxide" ~ 0.6513,
-                                   CHEMICAL_NAME == "Copper Oxychloride" ~ 0.2975,
-                                   CHEMICAL_NAME == "Copper Sulfate (Anhydrous)" ~ 0.3981,
-                                   CHEMICAL_NAME == "Copper Diammonium Diacetate Complex" ~ 0.08),
-         .after = KG_CHEMICAL_APPLIED)
+# Create table of all chemicals used, then found conversions online
+# Decided not to do this, because there are too many chemicals that have 'fuzzy' names and I cannot trace all of them accurately.  So, I will just plot kg of chemical applied
+chemicals <- allCu %>% count(CHEMICAL_NAME)
 
-rice_all <- rice_all %>%
-  mutate(KG_COPPER_APPLIED = KG_CHEMICAL_APPLIED*Cu_Conversion,
-         .after = Cu_Conversion)
+# allCu <- allCu %>%
+#   mutate(Cu_Conversion = case_when(CHEMICAL_NAME == "Copper Sulfate (Pentahydrate)" ~ 0.2545,
+#                                    CHEMICAL_NAME == "Copper" ~ 1,
+#                                    CHEMICAL_NAME == "Copper Sulfate (Basic)" ~ 0.4929,
+#                                    CHEMICAL_NAME == "Copper Hydroxide" ~ 0.6513,
+#                                    CHEMICAL_NAME == "Copper Oxychloride" ~ 0.2975,
+#                                    CHEMICAL_NAME == "Copper Sulfate (Anhydrous)" ~ 0.3981,
+#                                    CHEMICAL_NAME == "Copper Diammonium Diacetate Complex" ~ 0.08),
+#          .after = KG_CHEMICAL_APPLIED)
+
+# Convert pounds copper applied to kilograms copper
+# allCu <- allCu %>%
+#   mutate(KG_COPPER_APPLIED = KG_CHEMICAL_APPLIED*Cu_Conversion,
+#          .after = Cu_Conversion)
 ```
 
+# Plots made with just rice_all df.  Don't need to run this.
 ```{r rice_all: Plots}
 # Plotting for Comps Proposal
 
@@ -217,16 +240,107 @@ allCu$SITE_NAME <- factor(str_to_title(allCu$SITE_NAME))
 allCu$PRODUCT_NAME <- factor(str_to_title(allCu$PRODUCT_NAME))
 
 # rice
-rice$APPLICATION_MONTH <- factor(str_to_title(rice$APPLICATION_MONTH),
-                                  levels = c("January", "February", "March", "April", "May", "June", 
-                                             "July", "August", "September", "October", "November", "December"))
-rice$COUNTY_NAME <- factor(str_to_title(rice$COUNTY_NAME))
-rice$CHEMICAL_NAME <- factor(str_to_title(rice$CHEMICAL_NAME))
-rice$SITE_NAME <- factor(str_to_title(rice$SITE_NAME))
-rice$PRODUCT_NAME <- factor(str_to_title(rice$PRODUCT_NAME))
+# rice$APPLICATION_MONTH <- factor(str_to_title(rice$APPLICATION_MONTH),
+#                                   levels = c("January", "February", "March", "April", "May", "June", 
+#                                              "July", "August", "September", "October", "November", "December"))
+# rice$COUNTY_NAME <- factor(str_to_title(rice$COUNTY_NAME))
+# rice$CHEMICAL_NAME <- factor(str_to_title(rice$CHEMICAL_NAME))
+# rice$SITE_NAME <- factor(str_to_title(rice$SITE_NAME))
+# rice$PRODUCT_NAME <- factor(str_to_title(rice$PRODUCT_NAME))
 
 ```
 
+# Plots made with allCu data.
+```{r rice_all: Plots}
+# Plotting for Comps Proposal
+
+# First, need to make column to classify rice crops
+# These are the possible SITE_NAME values:
+unique(allCu$SITE_NAME[str_detect(allCu$SITE_NAME, "Rice")])
+
+# Create classifying variable
+allCu <- allCu %>%
+  mutate(RICE = case_when(SITE_NAME == "Rice (All Or Unspec)" ~ "Rice",
+                          SITE_NAME == "Rice, Wild (Grain Crop)" ~ "Rice",
+                          TRUE ~ "Not Rice"),
+         .after = SITE_NAME)
+
+# Double-check for accuracy
+unique(allCu$RICE)
+
+
+# Plot of KG_CHEMICAL_APPLIED, not split by RICE
+allCu %>%
+  group_by(YEAR) %>%
+  summarize(KG_CHEMICAL_APPLIED) %>%
+  ggplot(aes(x = factor(YEAR), y = KG_CHEMICAL_APPLIED)) + 
+  stat_summary(fun = "sum", geom = "bar", aes(fill = after_stat(y)), show.legend = TRUE) + 
+  # geom_bar(stat = "identity") + 
+  labs(x = "", y = "Kilograms of Chemical Applied", fill = "") +
+  scale_x_discrete(breaks = c("1990", "1995", "2000", "2005", "2010", "2015", "2020")) +
+  scale_y_continuous(labels = scales::comma,
+                     expand = expansion(mult = c(0, 0.05))) +
+  scale_fill_distiller(palette = "Oranges",
+                       trans = "reverse",
+                       labels = scales::comma) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 15),
+        axis.title.y = element_text(size = 20, 
+                                    margin = margin(t = 0, b = 0, l = 0, r = 10))) + 
+  guides(fill = guide_colorbar(reverse = TRUE))
+
+
+# Plot of KG_CHEMICAL_APPLIED, IS split by RICE
+allCu %>%
+  group_by(YEAR) %>%
+  summarize(KG_CHEMICAL_APPLIED, RICE) %>%
+  ggplot(aes(x = factor(YEAR), y = KG_CHEMICAL_APPLIED, fill = factor(RICE))) + 
+  # stat_summary(fun = "sum", geom = "bar", show.legend = TRUE) + 
+  geom_bar(stat = "identity", position = "stack") +
+  labs(x = "", y = "Kilograms of Chemical Applied", fill = "Rice Crop?") +
+  scale_x_discrete(breaks = c("1990", "1995", "2000", "2005", "2010", "2015", "2020")) +
+  scale_y_continuous(labels = scales::comma,
+                     expand = expansion(mult = c(0, 0.05))) +
+  # scale_fill_distiller(palette = "Oranges",
+  #                      trans = "reverse",
+  #                      labels = scales::comma) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 15),
+        axis.title.y = element_text(size = 20, 
+                                    margin = margin(t = 0, b = 0, l = 0, r = 10))) + 
+  guides(fill = guide_colorbar(reverse = TRUE))
+
+# Plot of KG_CHEMICAL_APPLIED, split by all crops
+allCu %>%
+  group_by(YEAR) %>%
+  summarize(KG_CHEMICAL_APPLIED, SITE_NAME) %>%
+  ggplot(aes(x = factor(YEAR), y = KG_CHEMICAL_APPLIED, fill = SITE_NAME)) + 
+  # stat_summary(fun = "sum", geom = "bar", show.legend = TRUE) + 
+  geom_bar(stat = "identity", position = "stack", show.legend = FALSE) +
+  labs(x = "", y = "Kilograms of Chemical Applied", fill = "Rice Crop?") +
+  scale_x_discrete(breaks = c("1990", "1995", "2000", "2005", "2010", "2015", "2020")) +
+  scale_y_continuous(labels = scales::comma,
+                     expand = expansion(mult = c(0, 0.05))) +
+  # scale_fill_distiller(palette = "Oranges",
+  #                      trans = "reverse",
+  #                      labels = scales::comma) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 15),
+        axis.title.y = element_text(size = 20, 
+                                    margin = margin(t = 0, b = 0, l = 0, r = 10)))
+
+# allCu data, faceted by county
+allCu %>%
+  group_by(YEAR, COUNTY_NAME) %>%
+  summarize(POUNDS_CHEMICAL_APPLIED) %>%
+  ggplot(aes(x = factor(YEAR), y = POUNDS_CHEMICAL_APPLIED)) + 
+  geom_bar(stat = "identity") +
+  facet_wrap(~COUNTY_NAME) +
+  theme_bw()
+
+```
+
+## Preparing for Mapping
 ### Split COMTRS into matching columns in PLSS df
 ```{r Split COMTRS}
 
@@ -256,30 +370,39 @@ allCu <- allCu %>%
          TownshipRa = str_c(Township, Range, sep = " "))
 
 
-# Repeat for rice
-rice <- rice %>%
-  mutate(County_Num = str_sub(COMTRS, start = 1, end = 2),
-         Meridian = str_sub(COMTRS, start = 3, end = 3),
-         Township = str_sub(COMTRS, start = 4, end = 6),
-         Range = str_sub(COMTRS, start = 7, end = 9),
-         Section = str_sub(COMTRS, start = 10, end = 11))
+# Repeat for rice.  NOT NEEDED
+# rice <- rice %>%
+#   mutate(County_Num = str_sub(COMTRS, start = 1, end = 2),
+#          Meridian = str_sub(COMTRS, start = 3, end = 3),
+#          Township = str_sub(COMTRS, start = 4, end = 6),
+#          Range = str_sub(COMTRS, start = 7, end = 9),
+#          Section = str_sub(COMTRS, start = 10, end = 11))
 
 # Further conversion to match PLSS (separated from above for clarity)
-rice <- rice %>%
-  mutate(Meridian = case_when(Meridian == "H" ~ "HM",
-                              Meridian == "M" ~ "MDM",
-                              Meridian == "S" ~ "SBM"),
-         # Township = str_c("T", Township),
-         # Range = str_c("R", Range),
-         TownshipRa = str_c(Township, Range, sep = " "))
+# rice <- rice %>%
+#   mutate(Meridian = case_when(Meridian == "H" ~ "HM",
+#                               Meridian == "M" ~ "MDM",
+#                               Meridian == "S" ~ "SBM"),
+#          # Township = str_c("T", Township),
+#          # Range = str_c("R", Range),
+#          TownshipRa = str_c(Township, Range, sep = " "))
 ```
 
 
-### Summary Statistics: Rice 
-```{r Summary Stats: Rice}
+### Summary Statistics
+```{r Summary Stats}
 
-# Bar graph of summary pounds applied by county and year
-rice %>%
+# Bar graph of summary pounds applied by county and year, for all, and for rice only
+allCu %>%
+  group_by(YEAR, COUNTY_NAME) %>%
+  summarize(POUNDS_CHEMICAL_APPLIED) %>%
+  ggplot(aes(x = COUNTY_NAME, y = POUNDS_CHEMICAL_APPLIED)) + 
+  geom_boxplot() +
+  facet_wrap(~YEAR) + 
+  theme_bw()
+
+# Rice only
+allCu[allCu$] %>%
   group_by(YEAR, COUNTY_NAME) %>%
   summarize(POUNDS_CHEMICAL_APPLIED) %>%
   ggplot(aes(x = COUNTY_NAME, y = POUNDS_CHEMICAL_APPLIED)) + 
