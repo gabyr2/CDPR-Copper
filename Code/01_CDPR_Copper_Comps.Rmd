@@ -515,7 +515,7 @@ This is actually not necessary because by leaving these township-range values as
 ```
 
 
-## Merging Rice Data to PLSS
+## Merging Rice Data to PLSS: Skip, just need to do this for allCu below
 ```{r Merging rice data to plss}
 
 # First need to summarize POUNDS_CHEMICAL_APPLIED by year and Township
@@ -645,6 +645,96 @@ allCu_sum_tr$TownshipRa[allCu_sum_tr$TownshipRa == "12S 31E"] <- "12S 21E"
 
 
 # Joined datasets year by year
+plss_allCu_tr1990 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 1990, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 1990))
+
+plss_allCu_tr1991 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 1991, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 1991))
+
+plss_allCu_tr1992 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 1992, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 1992))
+
+plss_allCu_tr1993 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 1993, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 1993))
+
+plss_allCu_tr1994 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 1994, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 1994))
+
+plss_allCu_tr1995 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 1995, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 1995))
+
+plss_allCu_tr1996 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 1996, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 1996))
+
+plss_allCu_tr1997 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 1997, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 1997))
+
+plss_allCu_tr1998 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 1998, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 1998))
+
+plss_allCu_tr1999 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 1999, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 1999))
+
+plss_allCu_tr2000 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2000, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2000))
+
+plss_allCu_tr2001 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2001, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2001))
+
+plss_allCu_tr2002 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2002, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2002))
+
+plss_allCu_tr2003 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2003, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2003))
+
+plss_allCu_tr2004 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2004, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2004))
+
+plss_allCu_tr2005 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2005, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2005))
+
+plss_allCu_tr2006 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2006, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2006))
+
+plss_allCu_tr2007 <- left_join(x = plss_tr, 
+                              y = allCu_sum_tr[allCu_sum_tr$YEAR == 2007, ], 
+                              by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
+  replace_na(list(YEAR = 2007))
+
 plss_allCu_tr2008 <- left_join(x = plss_tr, 
                               y = allCu_sum_tr[allCu_sum_tr$YEAR == 2008, ], 
                               by = c("TownshipRa" = "TownshipRa", "NAME" = "COUNTY_NAME")) %>%
@@ -723,9 +813,13 @@ plss_allCu_tr2021 <- left_join(x = plss_tr,
 #   mutate(sum_lbs_applied = replace_na(sum_lbs_applied, 0))
 
 
-plss_allCu_tr_all <- bind_rows(plss_allCu_tr2008, plss_allCu_tr2009, plss_allCu_tr2010, plss_allCu_tr2011, plss_allCu_tr2012,
-                               plss_allCu_tr2013, plss_allCu_tr2014, plss_allCu_tr2015, plss_allCu_tr2016, plss_allCu_tr2017,
-                               plss_allCu_tr2018, plss_allCu_tr2019, plss_allCu_tr2020, plss_allCu_tr2021)
+plss_allCu_tr_all <- bind_rows(plss_allCu_tr1990, plss_allCu_tr1991, plss_allCu_tr1992, plss_allCu_tr1993, plss_allCu_tr1994,
+                               plss_allCu_tr1995, plss_allCu_tr1996, plss_allCu_tr1997, plss_allCu_tr1998, plss_allCu_tr1999,
+                               plss_allCu_tr2000, plss_allCu_tr2001, plss_allCu_tr2002, plss_allCu_tr2003, plss_allCu_tr2004,
+                               plss_allCu_tr2005, plss_allCu_tr2006, plss_allCu_tr2007, plss_allCu_tr2008, plss_allCu_tr2009,
+                               plss_allCu_tr2010, plss_allCu_tr2011, plss_allCu_tr2012, plss_allCu_tr2013, plss_allCu_tr2014,
+                               plss_allCu_tr2015, plss_allCu_tr2016, plss_allCu_tr2017, plss_allCu_tr2018, plss_allCu_tr2019,
+                               plss_allCu_tr2020, plss_allCu_tr2021)
 
 
 # Test to print just one year of data
@@ -741,10 +835,10 @@ ggplot() +
                      palette = "Oranges")
 
 # Plot when using just 2021 dataframe
-library(extrafont)
-library(extrafontdb)
+# library(extrafont)
+# library(extrafontdb)
 # font_import()   # Run once
-loadfonts(device = "win")
+# loadfonts(device = "win")
 
 # To get the degree symbol to work: Tools -> Graphics -> Backend -> Cairo
 
@@ -763,6 +857,37 @@ ggplot() +
         axis.text = element_text(size = 15),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15))
+```
+
+
+# Statistics for Township 19N 02E.  
+This code cell pulls just the data for township 19N 02E.  This township had the most copper-based chemical applications in 2021, based on viewing the map.  So, I wanted to look at the history of copper-based chemical applications at this township alone to describe the legacy of copper applications to this single 36 mi^2 square (23,040 ac = 9324 ha)
+```{r}
+
+riceT <- plss_allCu_tr_all[plss_allCu_tr_all$TownshipRa == "19N 02E" & plss_allCu_tr_all$NAME == "Butte", ]
+
+# Using these statistics
+# mean annual rate: 53,252 kg copper-based chemical per year
+# since 1990, 1,704,053 kg of copper-based chemical applied in total.
+summary(riceT)
+sum(riceT$sum_kg_applied)
+
+
+ggplot(data = riceT, aes(x = factor(YEAR), y = sum_kg_applied)) + 
+  # stat_summary(fun = "sum", geom = "bar", aes(fill = after_stat(y)), show.legend = TRUE) + 
+  geom_bar(stat = "identity") +
+  labs(x = "", y = "Kilograms of Chemical Applied", fill = "") +
+  scale_x_discrete(breaks = c("1990", "1995", "2000", "2005", "2010", "2015", "2020")) +
+  scale_y_continuous(labels = scales::comma,
+                     expand = expansion(mult = c(0, 0.05))) +
+  scale_fill_distiller(palette = "Oranges",
+                       trans = "reverse",
+                       labels = scales::comma) +
+  theme_bw() +
+  theme(axis.text = element_text(size = 15),
+        axis.title.y = element_text(size = 20, 
+                                    margin = margin(t = 0, b = 0, l = 0, r = 10))) + 
+  guides(fill = guide_colorbar(reverse = TRUE))
 ```
 
 
