@@ -440,7 +440,7 @@ rice %>%
 # plss <- st_read("./Data/Spatial/Public_Land_Survey_System/Public_Land_Survey_System_(PLSS)%3A_Sections.shp")
 
 # This one is better, because it includes county names and numbers already
-plss <- st_read("./Data/Spatial/Statewide_CA_PLSS_NAD83AlbersCA/Statewide_CA_PLSS_NAD83AlbersCA.shp")
+plss <- st_read("D:/LocalRepos/CDPR-Copper/Data/Spatial/Statewide_CA_PLSS_NAD83AlbersCA/Statewide_CA_PLSS_NAD83AlbersCA.shp")
 
 
 # plss[1:10000,]
@@ -825,7 +825,7 @@ plss_allCu_tr_all <- bind_rows(plss_allCu_tr1990, plss_allCu_tr1991, plss_allCu_
 # Test to print just one year of data
 ggplot() +
   geom_sf(data = plss_allCu_tr_all[plss_allCu_tr_all$YEAR == 2021,], 
-          aes(geometry = geometry, fill = sum_lbs_applied)) + 
+          aes(geometry = geometry, fill = sum_kg_applied)) + 
   theme_bw() + 
   coord_sf() +
   # facet_wrap(~YEAR) +
@@ -857,6 +857,40 @@ ggplot() +
         axis.text = element_text(size = 15),
         legend.text = element_text(size = 12),
         legend.title = element_text(size = 15))
+
+
+# Map with SNP Labeled: for SETAC 2023 (Louisville, KY) conference talk
+# SEKI <- data.frame(long = -118.667387, lat = 36.601038, name = "Sequoia National Park")
+#  UTM: Easting = 350864.81, Northing = 4051909.77
+# NAD83 / California Albers: x = 119055, y = -156489
+
+ggplot() +
+  geom_sf(data = plss_allCu_tr2021, 
+          aes(geometry = geometry, fill = sum_kg_applied)) + 
+  theme_bw() + 
+  coord_sf() +
+  scale_fill_distiller(name = "Total Kilograms",
+                     labels = comma,
+                     trans = "reverse",
+                     palette = "Oranges",
+                     na.value = "grey99") +
+  geom_point(aes(x = 119055, y = -156489), 
+             size = 4, color = "black") + 
+  geom_curve(aes(x = 119055+300000, y = -156489+50000, xend = 119055, yend = -156489), 
+             arrow = arrow(), size = 1.5, color = "blue") + 
+  geom_label(aes(x = 119055, y = -156489, label = "Sequoia\nNational Park"), 
+             size = 5, nudge_x = 300000, nudge_y = 80000, show.legend = FALSE) + 
+  theme(text = element_text(family = "Lato"),
+        legend.position = c(0.75, 0.8),
+        axis.text = element_text(size = 15),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        title = element_text(size = 18)) +
+  labs(title = "Kg of Cu Pesticide Applied per Township in 2021",
+       x = NULL,
+       y = NULL)
+
+
 ```
 
 
@@ -904,11 +938,11 @@ plss_co_lines <- st_cast(plss_co, to = "MULTILINESTRING")
 
 allCu_map <- 
   mapview(plss_allCu_tr_all[plss_allCu_tr_all$YEAR == 2021,],
-          zcol = "sum_lbs_applied",
+          zcol = "sum_kg_applied",
           col.region = pal,
-          layer.name = "Total Pounds Cu Applied in 2021",
+          layer.name = "Total Kilograms Cu Applied in 2021",
           popup = popupTable(plss_allCu_tr_all[plss_allCu_tr_all$YEAR == 2021,],
-                             zcol = c("NAME", "TownshipRa", "sum_lbs_applied"))) + 
+                             zcol = c("NAME", "TownshipRa", "sum_kg_applied"))) + 
   mapview(plss_co_lines,
           color = "black", lwd = 1.5, legend = FALSE)
 
